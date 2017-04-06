@@ -72,7 +72,7 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     LOG(INFO) << "Loading annotation from " << gt_path;
 
     std::ifstream infile(gt_path.c_str());
-    string img_name, labels, cropInfos, clusterClassStr;
+    string img_name, labels, cropInfos, clusterClassStr, type;
     if (!sample_per_cluster_)
     {
         // sequential sampling
@@ -261,9 +261,11 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
         this->prefetch_[i].label_.Reshape(label_batchsize, label_num_channels, label_height, label_width);
 
     // init type
-    top[2]->Reshape(batchsize, 1);
+    vector<int> type_shape(batch_size, 1);
+    top[2]->Reshape(type_shape);
+    
     for (int i = 0; i < this->PREFETCH_COUNT; ++i)
-        this->prefetch_[i].type_.Reshape(batchsize, 1);
+        this->prefetch_[i].type_.Reshape(type_shape);
 
     LOG(INFO) << "output data size: " << top[0]->num() << "," << top[0]->channels() << "," << top[0]->height() << "," << top[0]->width();
     LOG(INFO) << "output label size: " << top[1]->num() << "," << top[1]->channels() << "," << top[1]->height() << "," << top[1]->width();
