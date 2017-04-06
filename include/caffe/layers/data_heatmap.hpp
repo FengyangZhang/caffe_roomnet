@@ -33,7 +33,7 @@ public:
     virtual inline const char* type() const { return "DataHeatmap"; }
 
     virtual inline int ExactNumBottomBlobs() const { return 0; }
-    virtual inline int ExactNumTopBlobs() const { return 2; }
+    virtual inline int ExactNumTopBlobs() const { return 3; }
 
 
 protected:
@@ -77,7 +77,10 @@ protected:
     vector< vector< pair<string, pair<vector<float>, pair<vector<float>, int> > > > > img_list_;
 
     // vector of (image, label) pairs
-    vector< pair<string, pair<vector<float>, pair<vector<float>, int> > > > img_label_list_;    
+    vector< pair<string, pair<vector<float>, pair<vector<float>, int> > > > img_label_list_;
+
+    // vector of (image, type) pairs
+    vector< pair<string, int> > img_type_list_;
 };
 
 }

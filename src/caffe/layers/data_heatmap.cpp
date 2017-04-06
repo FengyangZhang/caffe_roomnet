@@ -76,7 +76,7 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     if (!sample_per_cluster_)
     {
         // sequential sampling
-        while (infile >> img_name >> labels >> cropInfos >> clusterClassStr)
+        while (infile >> img_name >> labels >> cropInfos >> clusterClassStr >> type)
         {
             // read comma-separated list of regression labels
             std::vector <float> label;
@@ -105,6 +105,7 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
             int clusterClass = atoi(clusterClassStr.c_str());
             img_label_list_.push_back(std::make_pair(img_name, std::make_pair(label, std::make_pair(cropInfo, clusterClass))));
+            img_type_list_.push_back(std::make_pair(img_name, type));
         }
 
         // initialise image counter to 0
@@ -259,6 +260,11 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     for (int i = 0; i < this->PREFETCH_COUNT; ++i)
         this->prefetch_[i].label_.Reshape(label_batchsize, label_num_channels, label_height, label_width);
 
+    // init type
+    top[2]->Reshape(batchsize, 1);
+    for (int i = 0; i < this->PREFETCH_COUNT; ++i)
+        this->prefetch_[i].type_.Reshape(batchsize, 1);
+
     LOG(INFO) << "output data size: " << top[0]->num() << "," << top[0]->channels() << "," << top[0]->height() << "," << top[0]->width();
     LOG(INFO) << "output label size: " << top[1]->num() << "," << top[1]->channels() << "," << top[1]->height() << "," << top[1]->width();
     LOG(INFO) << "number of label channels: " << label_num_channels;
@@ -285,6 +291,7 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     // Pointers to blobs' float data
     Dtype* top_data = batch->data_.mutable_cpu_data();
     Dtype* top_label = batch->label_.mutable_cpu_data();
+    Dtype* top_type = batch->type_.mutable_cpu_data();
 
     cv::Mat img, img_res, img_annotation_vis, img_mean_vis, img_vis, img_res_vis, mean_img_this, seg, segTmp;
 
@@ -328,12 +335,13 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     std::vector<float> cur_label, cur_cropinfo;
     std::string img_name;
     int cur_class;
+    int cur_type;
 
     // loop over non-augmented images
     for (int idx_img = 0; idx_img < batchsize; idx_img++)
     {
         // get image name and class
-        this->GetCurImg(img_name, cur_label, cur_cropinfo, cur_class);
+        this->GetCurImg(img_name, cur_label, cur_cropinfo, cur_class, cur_type);
 
         // get number of channels for image label
         int label_num_channels = cur_label.size();
@@ -663,6 +671,10 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 }
             }
 
+            // store image type
+            DLOG(INFO) << "storing type";
+            top_type[idx_img_aug] = cur_type;
+
         } // jittered versions loop
 
         DLOG(INFO) << "next image";
@@ -683,7 +695,7 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
 
 template<typename Dtype>
-void DataHeatmapLayer<Dtype>::GetCurImg(string& img_name, std::vector<float>& img_label, std::vector<float>& crop_info, int& img_class)
+void DataHeatmapLayer<Dtype>::GetCurImg(string& img_name, std::vector<float>& img_label, std::vector<float>& crop_info, int& img_class, int& img_type)
 {
 
     if (!sample_per_cluster_)
@@ -692,6 +704,7 @@ void DataHeatmapLayer<Dtype>::GetCurImg(string& img_name, std::vector<float>& im
         img_label = img_label_list_[cur_img_].second.first;
         crop_info = img_label_list_[cur_img_].second.second.first;
         img_class = img_label_list_[cur_img_].second.second.second;
+        img_type = img_type_list_[cur_img_].second;
     }
     else
     {
