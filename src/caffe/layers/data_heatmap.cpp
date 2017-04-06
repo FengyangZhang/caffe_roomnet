@@ -105,7 +105,8 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
             int clusterClass = atoi(clusterClassStr.c_str());
             img_label_list_.push_back(std::make_pair(img_name, std::make_pair(label, std::make_pair(cropInfo, clusterClass))));
-            img_type_list_.push_back(std::make_pair(img_name, type));
+            int type_int = atoi(type.c_str());
+			img_type_list_.push_back(std::make_pair(img_name, type_int));
         }
 
         // initialise image counter to 0
@@ -261,7 +262,7 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
         this->prefetch_[i].label_.Reshape(label_batchsize, label_num_channels, label_height, label_width);
 
     // init type
-    vector<int> type_shape(batch_size, 1);
+    vector<int> type_shape(batchsize, 1);
     top[2]->Reshape(type_shape);
     
     for (int i = 0; i < this->PREFETCH_COUNT; ++i)
