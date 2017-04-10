@@ -73,14 +73,8 @@ protected:
     int cur_img_; // current image index
     vector<int> img_idx_map_; // current image indices for each class
 
-    // array of lists: one list of image names per class
-    vector< vector< pair<string, pair<vector<float>, pair<vector<float>, int> > > > > img_list_;
-
-    // vector of (image, label) pairs
-    vector< pair<string, pair<vector<float>, pair<vector<float>, int> > > > img_label_list_;
-
-    // vector of (image, type) pairs
-    vector< pair<string, int> > img_type_list_;
+    // vector of (image, label, type) pairs
+    vector< pair<string, pair<vector<float>, int > > > img_label_list_;
 };
 
 }

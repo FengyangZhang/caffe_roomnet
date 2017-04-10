@@ -72,11 +72,11 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     LOG(INFO) << "Loading annotation from " << gt_path;
 
     std::ifstream infile(gt_path.c_str());
-    string img_name, labels, cropInfos, clusterClassStr, typeStr;
+    string img_name, labels, typeStr;
     if (!sample_per_cluster_)
     {
         // sequential sampling
-        while (infile >> img_name >> labels >> cropInfos >> clusterClassStr >> typeStr)
+        while (infile >> img_name >> labels >> typeStr)
         {
             // read comma-separated list of regression labels
             std::vector <float> label;
@@ -94,85 +94,84 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
             }
 
             // read cropping info
-            std::vector <float> cropInfo;
-            std::istringstream ss2(cropInfos);
-            while (ss2)
-            {
-                std::string s;
-                if (!std::getline(ss2, s, ',')) break;
-                cropInfo.push_back(atof(s.c_str()));
-            }
+            // std::vector <float> cropInfo;
+            // std::istringstream ss2(cropInfos);
+            // while (ss2)
+            // {
+            //     std::string s;
+            //     if (!std::getline(ss2, s, ',')) break;
+            //     cropInfo.push_back(atof(s.c_str()));
+            // }
 
-            int clusterClass = atoi(clusterClassStr.c_str());
-            img_label_list_.push_back(std::make_pair(img_name, std::make_pair(label, std::make_pair(cropInfo, clusterClass))));
+            // int clusterClass = atoi(clusterClassStr.c_str());
             int type = atoi(typeStr.c_str());
-			img_type_list_.push_back(std::make_pair(img_name, type));
+            img_label_list_.push_back(std::make_pair(img_name, std::make_pair(label, type)));
         }
 
         // initialise image counter to 0
         cur_img_ = 0;
     }
-    else
-    {
-        // uniform sampling w.r.t. classes
-        while (infile >> img_name >> labels >> cropInfos >> clusterClassStr)
-        {
-            int clusterClass = atoi(clusterClassStr.c_str());
+    // else
+    // {
+    //     uniform sampling w.r.t. classes
+    //     while (infile >> img_name >> labels >> cropInfos >> clusterClassStr)
+    //     {
+    //         int clusterClass = atoi(clusterClassStr.c_str());
 
-            if (clusterClass + 1 > img_list_.size())
-            {
-                // expand the array
-                img_list_.resize(clusterClass + 1);
-            }
+    //         if (clusterClass + 1 > img_list_.size())
+    //         {
+    //             // expand the array
+    //             img_list_.resize(clusterClass + 1);
+    //         }
 
-            // read comma-separated list of regression labels
-            std::vector <float> label;
-            std::istringstream ss(labels);
-            int labelCounter = 1;
-            while (ss)
-            {
-                std::string s;
-                if (!std::getline(ss, s, ',')) break;
-                if (labelinds_.empty() || std::find(labelinds_.begin(), labelinds_.end(), labelCounter) != labelinds_.end())
-                {
-                    label.push_back(atof(s.c_str()));
-                }
-                labelCounter++;
-            }
+    //         // read comma-separated list of regression labels
+    //         std::vector <float> label;
+    //         std::istringstream ss(labels);
+    //         int labelCounter = 1;
+    //         while (ss)
+    //         {
+    //             std::string s;
+    //             if (!std::getline(ss, s, ',')) break;
+    //             if (labelinds_.empty() || std::find(labelinds_.begin(), labelinds_.end(), labelCounter) != labelinds_.end())
+    //             {
+    //                 label.push_back(atof(s.c_str()));
+    //             }
+    //             labelCounter++;
+    //         }
 
-            // read cropping info
-            std::vector <float> cropInfo;
-            std::istringstream ss2(cropInfos);
-            while (ss2)
-            {
-                std::string s;
-                if (!std::getline(ss2, s, ',')) break;
-                cropInfo.push_back(atof(s.c_str()));
-            }
+    //         // read cropping info
+    //         std::vector <float> cropInfo;
+    //         std::istringstream ss2(cropInfos);
+    //         while (ss2)
+    //         {
+    //             std::string s;
+    //             if (!std::getline(ss2, s, ',')) break;
+    //             cropInfo.push_back(atof(s.c_str()));
+    //         }
 
-            img_list_[clusterClass].push_back(std::make_pair(img_name, std::make_pair(label, std::make_pair(cropInfo, clusterClass))));
-        }
+    //         img_list_[clusterClass].push_back(std::make_pair(img_name, std::make_pair(label, std::make_pair(cropInfo, clusterClass))));
+    //     }
 
-        const int num_classes = img_list_.size();
+    //     const int num_classes = img_list_.size();
 
-        // init image sampling
-        cur_class_ = 0;
-        cur_class_img_.resize(num_classes);
+    //     // init image sampling
+    //     cur_class_ = 0;
+    //     cur_class_img_.resize(num_classes);
 
-        // init image indices for each class
-        for (int idx_class = 0; idx_class < num_classes; idx_class++)
-        {
-            if (sample_per_cluster_)
-            {
-                cur_class_img_[idx_class] = rand() % img_list_[idx_class].size();
-                LOG(INFO) << idx_class << " size: " << img_list_[idx_class].size();
-            }
-            else
-            {
-                cur_class_img_[idx_class] = 0;
-            }
-        }
-    }
+    //     // init image indices for each class
+    //     for (int idx_class = 0; idx_class < num_classes; idx_class++)
+    //     {
+    //         if (sample_per_cluster_)
+    //         {
+    //             cur_class_img_[idx_class] = rand() % img_list_[idx_class].size();
+    //             LOG(INFO) << idx_class << " size: " << img_list_[idx_class].size();
+    //         }
+    //         else
+    //         {
+    //             cur_class_img_[idx_class] = 0;
+    //         }
+    //     }
+    // }
 
     if (!heatmap_data_param.has_meanfile())
     {
@@ -254,8 +253,8 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     int label_num_channels;
     if (!sample_per_cluster_)
         label_num_channels = img_label_list_[0].second.first.size();
-    else
-        label_num_channels = img_list_[0][0].second.first.size();
+    // else
+    //     label_num_channels = img_list_[0][0].second.first.size();
     label_num_channels /= 2;
     top[1]->Reshape(label_batchsize, label_num_channels, label_height, label_width);
     for (int i = 0; i < this->PREFETCH_COUNT; ++i)
@@ -339,7 +338,7 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     for (int idx_img = 0; idx_img < batchsize; idx_img++)
     {
         // get image information
-        this->GetCurImg(img_name, cur_label, cur_cropinfo, cur_class, cur_type);
+        this->GetCurImg(img_name, cur_label, cur_type);
 
         // get number of channels for image label
         int label_num_channels = cur_label.size();
@@ -700,17 +699,15 @@ void DataHeatmapLayer<Dtype>::GetCurImg(string& img_name, std::vector<float>& im
     {
         img_name = img_label_list_[cur_img_].first;
         img_label = img_label_list_[cur_img_].second.first;
-        crop_info = img_label_list_[cur_img_].second.second.first;
-        img_class = img_label_list_[cur_img_].second.second.second;
-        img_type = img_type_list_[cur_img_].second;
+        img_type = img_type_list_[cur_img_].second.second;
     }
-    else
-    {
-        img_class = cur_class_;
-        img_name = img_list_[img_class][cur_class_img_[img_class]].first;
-        img_label = img_list_[img_class][cur_class_img_[img_class]].second.first;
-        crop_info = img_list_[img_class][cur_class_img_[img_class]].second.second.first;
-    }
+    // else
+    // {
+        // img_class = cur_class_;
+        // img_name = img_list_[img_class][cur_class_img_[img_class]].first;
+        // img_label = img_list_[img_class][cur_class_img_[img_class]].second.first;
+        // crop_info = img_list_[img_class][cur_class_img_[img_class]].second.second.first;
+    // }
 }
 
 template<typename Dtype>
@@ -725,18 +722,18 @@ void DataHeatmapLayer<Dtype>::AdvanceCurImg()
     }
     else
     {
-        const int num_classes = img_list_.size();
+        // const int num_classes = img_list_.size();
 
-        if (cur_class_img_[cur_class_] < img_list_[cur_class_].size() - 1)
-            cur_class_img_[cur_class_]++;
-        else
-            cur_class_img_[cur_class_] = 0;
+        // if (cur_class_img_[cur_class_] < img_list_[cur_class_].size() - 1)
+        //     cur_class_img_[cur_class_]++;
+        // else
+        //     cur_class_img_[cur_class_] = 0;
 
-        // move to the next class
-        if (cur_class_ < num_classes - 1)
-            cur_class_++;
-        else
-            cur_class_ = 0;
+        // // move to the next class
+        // if (cur_class_ < num_classes - 1)
+        //     cur_class_++;
+        // else
+        //     cur_class_ = 0;
     }
 
 }
