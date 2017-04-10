@@ -47,7 +47,6 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     const int label_height = heatmap_data_param.label_height();
     const int size = heatmap_data_param.cropsize();
     const int outsize = heatmap_data_param.outsize();
-    const int label_batchsize = batchsize;
     sample_per_cluster_ = heatmap_data_param.sample_per_cluster();
     root_img_dir_ = heatmap_data_param.root_img_dir();
 
@@ -256,9 +255,9 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     // else
     //     label_num_channels = img_list_[0][0].second.first.size();
     label_num_channels /= 2;
-    top[1]->Reshape(label_batchsize, label_num_channels, label_height, label_width);
+    top[1]->Reshape(batchsize, label_num_channels, label_height, label_width);
     for (int i = 0; i < this->PREFETCH_COUNT; ++i)
-        this->prefetch_[i].label_.Reshape(label_batchsize, label_num_channels, label_height, label_width);
+        this->prefetch_[i].label_.Reshape(batchsize, label_num_channels, label_height, label_width);
 
     // init type
     vector<int> type_shape(batchsize, 1);
@@ -329,9 +328,8 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     }
 
     // collect "batchsize" images
-    std::vector<float> cur_label, cur_cropinfo;
+    std::vector<float> cur_label;
     std::string img_name;
-    int cur_class;
     int cur_type;
 
     // loop over non-augmented images
@@ -396,42 +394,37 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             img_vis = img.clone();
 
         // subtract per-video mean if used
-        int meanInd = 0;
-        if (sub_mean)
-        {
-            std::string delimiter = "/";
-            std::string img_name_subdirImg = img_name.substr(img_name.find(delimiter) + 1, img_name.length());
-            std::string meanIndStr = img_name_subdirImg.substr(0, img_name_subdirImg.find(delimiter));
-            meanInd = atoi(meanIndStr.c_str()) - 1;
+        // int meanInd = 0;
+        // if (sub_mean)
+        // {
+        //     std::string delimiter = "/";
+        //     std::string img_name_subdirImg = img_name.substr(img_name.find(delimiter) + 1, img_name.length());
+        //     std::string meanIndStr = img_name_subdirImg.substr(0, img_name_subdirImg.find(delimiter));
+        //     meanInd = atoi(meanIndStr.c_str()) - 1;
 
-            // subtract the cropped mean
-            mean_img_this = this->mean_img_[meanInd].clone();
+        //     // subtract the cropped mean
+        //     mean_img_this = this->mean_img_[meanInd].clone();
 
-            DLOG(INFO) << "Image size: " << width << "x" << height;
-            DLOG(INFO) << "Crop info: " << cur_cropinfo[0] << " " <<  cur_cropinfo[1] << " " << cur_cropinfo[2] << " " << cur_cropinfo[3] << " " << cur_cropinfo[4];
-            DLOG(INFO) << "Crop info after: " << cur_cropinfo[0] << " " <<  cur_cropinfo[1] << " " << cur_cropinfo[2] << " " << cur_cropinfo[3] << " " << cur_cropinfo[4];
-            DLOG(INFO) << "Mean image size: " << mean_img_this.cols << "x" << mean_img_this.rows;
-            DLOG(INFO) << "Cropping: " << cur_cropinfo[0] - 1 << " " << cur_cropinfo[2] - 1 << " " << width << " " << height;
+        //     DLOG(INFO) << "Image size: " << width << "x" << height;
 
-            // crop and resize mean image
-            cv::Rect crop(cur_cropinfo[0] - 1, cur_cropinfo[2] - 1, cur_cropinfo[1] - cur_cropinfo[0], cur_cropinfo[3] - cur_cropinfo[2]);
-            mean_img_this = mean_img_this(crop);
-            cv::resize(mean_img_this, mean_img_this, img.size());
+        //     // crop and resize mean image
+        //     mean_img_this = mean_img_this(crop);
+        //     cv::resize(mean_img_this, mean_img_this, img.size());
 
-            DLOG(INFO) << "Cropped mean image.";
+        //     DLOG(INFO) << "Cropped mean image.";
 
-            img -= mean_img_this;
+        //     img -= mean_img_this;
 
-            DLOG(INFO) << "Subtracted mean image.";
+        //     DLOG(INFO) << "Subtracted mean image.";
 
-            if (visualise)
-            {
-                img_vis -= mean_img_this;
-                img_mean_vis = mean_img_this.clone() / 255;
-                cv::cvtColor(img_mean_vis, img_mean_vis, CV_RGB2BGR);
-                cv::imshow("mean image", img_mean_vis);
-            }
-        }
+        //     if (visualise)
+        //     {
+        //         img_vis -= mean_img_this;
+        //         img_mean_vis = mean_img_this.clone() / 255;
+        //         cv::cvtColor(img_mean_vis, img_mean_vis, CV_RGB2BGR);
+        //         cv::imshow("mean image", img_mean_vis);
+        //     }
+        // }
 
         // pad images that aren't wide enough
         if (x_border < 0)
