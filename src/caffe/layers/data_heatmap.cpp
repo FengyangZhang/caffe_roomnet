@@ -72,7 +72,7 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     LOG(INFO) << "Loading annotation from " << gt_path;
 
     std::ifstream infile(gt_path.c_str());
-    string img_name, labels, cropInfos, clusterClassStr, type;
+    string img_name, labels, cropInfos, clusterClassStr, typeStr;
     if (!sample_per_cluster_)
     {
         // sequential sampling

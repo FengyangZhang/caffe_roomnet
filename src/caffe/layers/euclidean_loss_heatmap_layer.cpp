@@ -53,18 +53,19 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
     const Dtype* gt_pred = bottom[1]->cpu_data();    // GT predictions
     const Dtype* type_prob_pred = bottom[2]->cpu_data();  // Type prob predictions
     // range of indices of heatmaps for each predicted type of image
-    const vector<int, vector<int>> type_ind_range;
-    type_ind_range.push_back(std::make_pair(0, std::make_pair(0, 7)));
-    type_ind_range.push_back(std::make_pair(1, std::make_pair(8, 13)));
-    type_ind_range.push_back(std::make_pair(2, std::make_pair(14, 19)));
-    type_ind_range.push_back(std::make_pair(3, std::make_pair(20, 23)));
-    type_ind_range.push_back(std::make_pair(4, std::make_pair(24, 27)));
-    type_ind_range.push_back(std::make_pair(5, std::make_pair(28, 33)));
-    type_ind_range.push_back(std::make_pair(6, std::make_pair(34, 37)));
-    type_ind_range.push_back(std::make_pair(7, std::make_pair(38, 41)));
-    type_ind_range.push_back(std::make_pair(8, std::make_pair(42, 43)));
-    type_ind_range.push_back(std::make_pair(9, std::make_pair(44, 45)));
-    type_ind_range.push_back(std::make_pair(10, std::make_pair(46, 47)));
+    const int type_ind_range[12] = {0, 8, 14, 20, 24, 28, 34, 38, 42, 44, 46, 48};
+	//const vector< pair<int, int> > type_ind_range;
+    //type_ind_range.push_back(std::make_pair(0, 7));
+    //type_ind_range.push_back(std::make_pair(8, 13));
+    //type_ind_range.push_back(std::make_pair(14, 19));
+    //type_ind_range.push_back(std::make_pair(20, 23));
+    //type_ind_range.push_back(std::make_pair(24, 27));
+    //type_ind_range.push_back(std::make_pair(28, 33));
+    //type_ind_range.push_back(std::make_pair(34, 37));
+    //type_ind_range.push_back(std::make_pair(38, 41));
+    //type_ind_range.push_back(std::make_pair(42, 43));
+    //type_ind_range.push_back(std::make_pair(44, 45));
+    //type_ind_range.push_back(std::make_pair(46, 47));
 
     const int num_images = bottom[1]->num();
     const int label_height = bottom[1]->height();
@@ -95,9 +96,12 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
     for (int idx_img = 0; idx_img < num_images; idx_img++)
     {
         // find predicted type indice
-        type_pred = *std::max_element(num_types*idx_img, num_types*(idx_img+1)) - num_types * idx_img; 
+        int offset = num_types * idx_img;
+        //int begin_ptr = type_prob_pred + num_types * idx_img;
+		//int end_ptr = type_prob_pred + num_types * (idx_img + 1);
+        int type_pred = *std::max_element(type_prob_pred + offset, type_prob_pred + offset + num_types) - offset; 
         // Compute loss (only those channels of the predicted layout type)
-        for (int idx_ch = type_ind_range[type_pred].first; idx_ch <= type_ind_range[type_pred].second; idx_ch++)
+        for (int idx_ch = type_ind_range[type_pred]; idx_ch <= type_ind_range[type_pred+1] - 1; idx_ch++)
         {
             for (int i = 0; i < label_height; i++)
             {
@@ -107,7 +111,7 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
                     // euclidean loss per pixel
                     float diff = (float)bottom_pred[image_idx] - (float)gt_pred[image_idx];
                     loss += diff * diff;
-                    diff_[idx_img][idx_ch][i][j] = diff;
+                    diff_.mutable_cpu_data()[image_idx] = diff;
 
                     // Store visualisation for given channel
                     if (idx_ch == visualise_channel && visualise)
