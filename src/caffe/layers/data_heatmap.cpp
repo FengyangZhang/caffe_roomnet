@@ -249,9 +249,7 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     this->datum_size_ = this->datum_channels_ * outsize * outsize;
 
     // init label
-    int label_num_channels;
-    if (!sample_per_cluster_)
-        label_num_channels = img_label_list_[0].second.first.size();
+    int label_num_channels = img_label_list_[0].second.first.size();
     // else
     //     label_num_channels = img_list_[0][0].second.first.size();
     label_num_channels /= 2;
@@ -390,9 +388,6 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             segTmp.copyTo(img, seg);
         }
 
-        if (visualise)
-            img_vis = img.clone();
-
         // subtract per-video mean if used
         // int meanInd = 0;
         // if (sub_mean)
@@ -455,6 +450,10 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             // augmented image index in the resulting batch
             const int idx_img_aug = idx_img * num_aug + idx_aug;
             std::vector<float> cur_label_aug = cur_label;
+
+            // store image type
+            DLOG(INFO) << "storing type";
+            top_type[idx_img_aug] = cur_type;
 
             if (random_crop)
             {
@@ -660,10 +659,6 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                     }
                 }
             }
-
-            // store image type
-            DLOG(INFO) << "storing type";
-            top_type[idx_img_aug] = cur_type;
 
         } // jittered versions loop
 
