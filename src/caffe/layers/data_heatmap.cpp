@@ -692,14 +692,14 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
 
 template<typename Dtype>
-void DataHeatmapLayer<Dtype>::GetCurImg(string& img_name, std::vector<float>& img_label, std::vector<float>& crop_info, int& img_class, int& img_type)
+void DataHeatmapLayer<Dtype>::GetCurImg(string& img_name, std::vector<float>& img_label, int& img_type)
 {
 
     if (!sample_per_cluster_)
     {
         img_name = img_label_list_[cur_img_].first;
         img_label = img_label_list_[cur_img_].second.first;
-        img_type = img_type_list_[cur_img_].second.second;
+        img_type = img_label_list_[cur_img_].second.second;
     }
     // else
     // {

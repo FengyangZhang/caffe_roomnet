@@ -40,7 +40,7 @@ protected:
     virtual void load_batch(Batch<Dtype>* batch);
 
     // Filename of current image
-    inline void GetCurImg(string& img_name, std::vector<float>& img_class, std::vector<float>& crop_info, int& cur_class, int& cur_type);
+    inline void GetCurImg(string& img_name, std::vector<float>& img_class, int& cur_type);
 
     inline void AdvanceCurImg();
 
