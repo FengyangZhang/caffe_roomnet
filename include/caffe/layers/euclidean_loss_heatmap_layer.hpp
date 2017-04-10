@@ -11,6 +11,7 @@
 #include "caffe/filler.hpp"
 #include "caffe/internal_thread.hpp"
 #include "caffe/proto/caffe.pb.h"
+#include "caffe/layers/softmax_loss_layer.hpp"
 
 namespace caffe
 {

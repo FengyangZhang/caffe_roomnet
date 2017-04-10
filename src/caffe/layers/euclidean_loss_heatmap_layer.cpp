@@ -51,10 +51,27 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
 
     const Dtype* bottom_pred = bottom[0]->cpu_data(); // predictions for all images
     const Dtype* gt_pred = bottom[1]->cpu_data();    // GT predictions
+    const Dtype* type_prob_pred = bottom[2]->cpu_data();  // Type prob predictions
+    // range of indices of heatmaps for each predicted type of image
+    const vector<int, vector<int>> type_ind_range;
+    type_ind_range.push_back(std::make_pair(0, std::make_pair(0, 7)));
+    type_ind_range.push_back(std::make_pair(1, std::make_pair(8, 13)));
+    type_ind_range.push_back(std::make_pair(2, std::make_pair(14, 19)));
+    type_ind_range.push_back(std::make_pair(3, std::make_pair(20, 23)));
+    type_ind_range.push_back(std::make_pair(4, std::make_pair(24, 27)));
+    type_ind_range.push_back(std::make_pair(5, std::make_pair(28, 33)));
+    type_ind_range.push_back(std::make_pair(6, std::make_pair(34, 37)));
+    type_ind_range.push_back(std::make_pair(7, std::make_pair(38, 41)));
+    type_ind_range.push_back(std::make_pair(8, std::make_pair(42, 43)));
+    type_ind_range.push_back(std::make_pair(9, std::make_pair(44, 45)));
+    type_ind_range.push_back(std::make_pair(10, std::make_pair(46, 47)));
+
     const int num_images = bottom[1]->num();
     const int label_height = bottom[1]->height();
     const int label_width = bottom[1]->width();
     const int num_channels = bottom[0]->channels();
+    // hardcode to be removed
+    const int num_types = 11; 
 
     DLOG(INFO) << "bottom size: " << bottom[0]->height() << " " << bottom[0]->width() << " " << bottom[0]->channels();
 
@@ -77,16 +94,20 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
     // Loop over images
     for (int idx_img = 0; idx_img < num_images; idx_img++)
     {
-        // Compute loss
-        for (int idx_ch = 0; idx_ch < num_channels; idx_ch++)
+        // find predicted type indice
+        type_pred = *std::max_element(num_types*idx_img, num_types*(idx_img+1)) - num_types * idx_img; 
+        // Compute loss (only those channels of the predicted layout type)
+        for (int idx_ch = type_ind_range[type_pred].first; idx_ch <= type_ind_range[type_pred].second; idx_ch++)
         {
             for (int i = 0; i < label_height; i++)
             {
                 for (int j = 0; j < label_width; j++)
                 {
                     int image_idx = idx_img * label_img_size + idx_ch * label_channel_size + i * label_height + j;
+                    // euclidean loss per pixel
                     float diff = (float)bottom_pred[image_idx] - (float)gt_pred[image_idx];
                     loss += diff * diff;
+                    diff_[idx_img][idx_ch][i][j] = diff;
 
                     // Store visualisation for given channel
                     if (idx_ch == visualise_channel && visualise)
@@ -239,17 +260,18 @@ template <typename Dtype>
 void EuclideanLossHeatmapLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom)
 {
-    const int count = bottom[0]->count();
-    const int channels = bottom[0]->channels();
-
-    caffe_sub(count, bottom[0]->cpu_data(), bottom[1]->cpu_data(), diff_.mutable_cpu_data());
-
-    // strictly speaking, should be normalising by (2 * channels) due to 1/2 multiplier in front of the loss
-    Dtype loss = caffe_cpu_dot(count, diff_.cpu_data(), diff_.cpu_data()) / Dtype(channels);
-
-    // copy the gradient
-    memcpy(bottom[0]->mutable_cpu_diff(), diff_.cpu_data(), sizeof(Dtype) * count);
-    memcpy(bottom[1]->mutable_cpu_diff(), diff_.cpu_data(), sizeof(Dtype) * count);
+    for (int i = 0; i < 2; ++i) {
+    if (propagate_down[i]) {
+      const Dtype sign = (i == 0) ? 1 : -1;
+      const Dtype alpha = sign * top[0]->cpu_diff()[0] / bottom[i]->num();
+      caffe_cpu_axpby(
+          bottom[i]->count(),              // count
+          alpha,                              // alpha
+          diff_.cpu_data(),                   // a
+          Dtype(0),                           // beta
+          bottom[i]->mutable_cpu_diff());  // b
+    }
+  }
 
 }
 
