@@ -9,13 +9,13 @@
 namespace caffe {
 
 template <typename Dtype>
-BaseDataLayer<Dtype>::BaseDataLayer(const LayerParameter& param)
+RoomnetDataLayer<Dtype>::RoomnetDataLayer(const LayerParameter& param)
     : Layer<Dtype>(param),
       transform_param_(param.transform_param()) {
 }
 
 template <typename Dtype>
-void BaseDataLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+void RoomnetDataLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   if (top.size() == 1) {
     output_labels_ = false;
@@ -30,9 +30,9 @@ void BaseDataLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 }
 
 template <typename Dtype>
-BasePrefetchingDataLayer<Dtype>::BasePrefetchingDataLayer(
+RoomnetPrefetchingDataLayer<Dtype>::RoomnetPrefetchingDataLayer(
     const LayerParameter& param)
-    : BaseDataLayer<Dtype>(param),
+    : RoomnetDataLayer<Dtype>(param),
       prefetch_free_(), prefetch_full_() {
   for (int i = 0; i < PREFETCH_COUNT; ++i) {
     prefetch_free_.push(&prefetch_[i]);
@@ -40,9 +40,9 @@ BasePrefetchingDataLayer<Dtype>::BasePrefetchingDataLayer(
 }
 
 template <typename Dtype>
-void BasePrefetchingDataLayer<Dtype>::LayerSetUp(
+void RoomnetPrefetchingDataLayer<Dtype>::LayerSetUp(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
-  BaseDataLayer<Dtype>::LayerSetUp(bottom, top);
+  RoomnetDataLayer<Dtype>::LayerSetUp(bottom, top);
   // Before starting the prefetch thread, we make cpu_data and gpu_data
   // calls so that the prefetch thread does not accidentally make simultaneous
   // cudaMalloc calls when the main thread is running. In some GPUs this
@@ -70,7 +70,7 @@ void BasePrefetchingDataLayer<Dtype>::LayerSetUp(
 }
 
 template <typename Dtype>
-void BasePrefetchingDataLayer<Dtype>::InternalThreadEntry() {
+void RoomnetPrefetchingDataLayer<Dtype>::InternalThreadEntry() {
 #ifndef CPU_ONLY
   cudaStream_t stream;
   if (Caffe::mode() == Caffe::GPU) {
@@ -101,7 +101,7 @@ void BasePrefetchingDataLayer<Dtype>::InternalThreadEntry() {
 }
 
 template <typename Dtype>
-void BasePrefetchingDataLayer<Dtype>::Forward_cpu(
+void RoomnetPrefetchingDataLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   Batch<Dtype>* batch = prefetch_full_.pop("Data layer prefetch queue empty");
   // Reshape to loaded data.
@@ -122,10 +122,10 @@ void BasePrefetchingDataLayer<Dtype>::Forward_cpu(
 }
 
 #ifdef CPU_ONLY
-STUB_GPU_FORWARD(BasePrefetchingDataLayer, Forward);
+STUB_GPU_FORWARD(RoomnetPrefetchingDataLayer, Forward);
 #endif
 
-INSTANTIATE_CLASS(BaseDataLayer);
-INSTANTIATE_CLASS(BasePrefetchingDataLayer);
+INSTANTIATE_CLASS(RoomnetDataLayer);
+INSTANTIATE_CLASS(RoomnetPrefetchingDataLayer);
 
 }  // namespace caffe
