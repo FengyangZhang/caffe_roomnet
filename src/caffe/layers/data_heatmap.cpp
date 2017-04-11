@@ -242,7 +242,7 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
 
     // init data
-    this->transformed_data_.Reshape(batchsize, this->datum_channels_, outsize, outsize);
+    // this->transformed_data_.Reshape(batchsize, this->datum_channels_, outsize, outsize);
     top[0]->Reshape(batchsize, this->datum_channels_, outsize, outsize);
     for (int i = 0; i < this->PREFETCH_COUNT; ++i)
         this->prefetch_[i].data_.Reshape(batchsize, this->datum_channels_, outsize, outsize);
