@@ -88,3 +88,7 @@ class BasePrefetchingDataLayer :
 
   Blob<Dtype> transformed_data_;
 };
+
+}
+
+#endif
