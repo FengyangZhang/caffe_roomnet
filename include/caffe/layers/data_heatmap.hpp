@@ -19,13 +19,13 @@ namespace caffe
 
 
 template<typename Dtype>
-class DataHeatmapLayer: public BasePrefetchingDataLayer<Dtype>
+class DataHeatmapLayer: public RoomnetPrefetchingDataLayer<Dtype>
 {
 
 public:
 
     explicit DataHeatmapLayer(const LayerParameter& param)
-        : BasePrefetchingDataLayer<Dtype>(param) {}
+        : RoomnetPrefetchingDataLayer<Dtype>(param) {}
     virtual ~DataHeatmapLayer();
     virtual void DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
                                 const vector<Blob<Dtype>*>& top);

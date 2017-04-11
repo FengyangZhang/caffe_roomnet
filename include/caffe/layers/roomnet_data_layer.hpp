@@ -26,12 +26,12 @@ namespace caffe {
  * TODO(dox): thorough documentation for Forward and proto params.
  */
 template <typename Dtype>
-class BaseDataLayer : public Layer<Dtype> {
+class RoomnetDataLayer : public Layer<Dtype> {
  public:
-  explicit BaseDataLayer(const LayerParameter& param);
+  explicit RoomnetDataLayer(const LayerParameter& param);
   // LayerSetUp: implements common data layer setup functionality, and calls
   // DataLayerSetUp to do special data layer setup for individual layer types.
-  // This method may not be overridden except by the BasePrefetchingDataLayer.
+  // This method may not be overridden except by the RoomnetPrefetchingDataLayer.
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   // Data layers should be shared by multiple solvers in parallel
@@ -60,10 +60,10 @@ class Batch {
 };
 
 template <typename Dtype>
-class BasePrefetchingDataLayer :
-    public BaseDataLayer<Dtype>, public InternalThread {
+class RoomnetPrefetchingDataLayer :
+    public RoomnetDataLayer<Dtype>, public InternalThread {
  public:
-  explicit BasePrefetchingDataLayer(const LayerParameter& param);
+  explicit RoomnetPrefetchingDataLayer(const LayerParameter& param);
   // LayerSetUp: implements common data layer setup functionality, and calls
   // DataLayerSetUp to do special data layer setup for individual layer types.
   // This method may not be overridden.
