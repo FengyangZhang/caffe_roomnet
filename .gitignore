@@ -96,3 +96,7 @@ LOCK
 LOG*
 CURRENT
 MANIFEST-*
+
+# added by fengyangz
+core.*
+train/*
