@@ -1286,7 +1286,7 @@ layer {
       type: "constant"
     }
     num_output: 64
-    pad: 1
+    pad: 0
     kernel_size: 1
   }
 }
@@ -1341,7 +1341,7 @@ layer {
       type: "constant"
     }
     num_output: 48
-    pad: 1
+    pad: 0
     kernel_size: 1
   }
 }
