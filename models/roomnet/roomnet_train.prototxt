@@ -1377,10 +1377,11 @@ layer {
 }
 layer {
   name: "keypoint_loss"
-    type: "EuclideanLossHeatmap"
-    bottom: "conv_final_48_D"
-    bottom: "heatmap_gt"
-    bottom: "fc_11"
+  type: "EuclideanLossHeatmap"
+  bottom: "conv_final_48_D"
+  bottom: "heatmap_gt"
+  bottom: "fc_11"
+  top: "loss"
 }
 layer {
   name: "type_loss"
