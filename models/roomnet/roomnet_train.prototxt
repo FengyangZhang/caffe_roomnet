@@ -1380,7 +1380,7 @@ layer {
     type: "EuclideanLossHeatmap"
     bottom: "conv_final_48_D"
     bottom: "heatmap_gt"
-    bottom: "type"
+    bottom: "fc_11"
 }
 layer {
   name: "type_loss"
