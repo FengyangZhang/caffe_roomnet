@@ -258,7 +258,7 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
         this->prefetch_[i].label_.Reshape(batchsize, label_num_channels, label_height, label_width);
 
     // init type
-    vector<int> type_shape(batchsize, 1);
+    vector<int> type_shape(1, batchsize);
     top[2]->Reshape(type_shape);
     
     for (int i = 0; i < this->PREFETCH_COUNT; ++i)

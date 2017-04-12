@@ -6,7 +6,6 @@ layer {
   top: "heatmap_gt"
   top: "type"
   visualise: false   
-  include: { phase: TRAIN }  
   heatmap_data_param {
     source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/train.txt"
     root_img_dir: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/images/"
@@ -1381,7 +1380,8 @@ layer {
   bottom: "conv_final_48_D"
   bottom: "heatmap_gt"
   bottom: "fc_11"
-  top: "loss"
+  top: "keypoint_loss"
+  loss_weight: 1
 }
 layer {
   name: "type_loss"
@@ -1392,4 +1392,5 @@ layer {
   softmax_param {
     engine: CAFFE
   }
+  loss_weight: 5
 }
