@@ -467,7 +467,7 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             if (rand() % 2)
             {
                 // flip
-                cv::flip(img, img_res, 1);
+                cv::flip(img, img, 1);
 
                 // "flip" annotation coordinates
                 for (int i = 0; i < label_num_channels; i += 2)
@@ -608,12 +608,12 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             DLOG(INFO) << "Resizing output image.";
 
             // resize to output image size
-            float resizeFact_x = (float)outsize / (float)img_res.cols;
-            float resizeFact_y = (float)outsize / (float)img_res.rows;
+            float resizeFact_x = (float)outsize / (float)img.cols;
+            float resizeFact_y = (float)outsize / (float)img.rows;
 
             cv::Size s(outsize, outsize);
-            cv::resize(img_res, img_res, s);
-
+            cv::resize(img, img_res, s);
+    
             // "resize" annotations
             for (int i = 0; i < label_num_channels; i+=2)
                 cur_label_aug[i] *= resizeFact_x;
