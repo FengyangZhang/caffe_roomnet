@@ -303,7 +303,6 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     const int size = heatmap_data_param.cropsize();
     const int outsize = heatmap_data_param.outsize();
     const int num_aug = 1;
-    const float resizeFact = (float)outsize / (float)size;
     const bool random_crop = heatmap_data_param.random_crop();
 
     // Shortcuts to global vars
@@ -430,17 +429,26 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             width = img.cols;
             x_border = width - size;
 
+            // FengyangZhang: ??? don't know why add offset here
             // add border offset to joints
-            for (int i = 0; i < label_num_channels; i += 2)
-                cur_label[i] = cur_label[i] + x_border;
+            // for (int i = 0; i < label_num_channels; i += 2)
+            //     cur_label[i] = cur_label[i] + x_border;
 
             DLOG(INFO) << "new width: " << width << "   x_border: " << x_border;
-            if (visualise)
-            {
-                img_vis = img.clone();
-                cv::copyMakeBorder(img_vis, img_vis, 0, 0, 0, -x_border, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
-            }
         }
+
+        if (y_border < 0)
+        {
+            DLOG(INFO) << "padding " << img_path << " -- not high enough.";
+
+            cv::copyMakeBorder(img, img, 0, -y_border, 0, 0, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
+            height = img.rows;
+            y_border = height - size;
+
+
+            DLOG(INFO) << "new height: " << height << "   y_border: " << y_border;
+        }        
+
 
         DLOG(INFO) << "Entering jitter loop.";
 
@@ -455,162 +463,163 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             DLOG(INFO) << "storing type";
             top_type[idx_img_aug] = cur_type;
 
-            if (random_crop)
+            // FengyangZhang: do random horizontal flip
+            if (rand() % 2)
             {
-                // random sampling
-                DLOG(INFO) << "random crop sampling";
+                // flip
+                cv::flip(img, img_res, 1);
 
-                // horizontal flip
-                if (rand() % 2)
-                {
-                    // flip
-                    cv::flip(img, img, 1);
-
-                    if (visualise)
-                        cv::flip(img_vis, img_vis, 1);
-
-                    // "flip" annotation coordinates
-                    for (int i = 0; i < label_num_channels; i += 2)
-                        cur_label_aug[i] = (float)width / (float)multfact - cur_label_aug[i];
-
-                    // "flip" annotation joint numbers
-                    // assumes i=0,1 are for head, and i=2,3 left wrist, i=4,5 right wrist etc
-                    // where coordinates are (x,y)
-                    if (flip_joint_labels)
-                    {
-                        float tmp_x, tmp_y;
-                        for (int i = flip_start_ind; i < label_num_channels; i += 4)
-                        {
-                            CHECK_LT(i + 3, label_num_channels);
-                            tmp_x = cur_label_aug[i];
-                            tmp_y = cur_label_aug[i + 1];
-                            cur_label_aug[i] = cur_label_aug[i + 2];
-                            cur_label_aug[i + 1] = cur_label_aug[i + 3];
-                            cur_label_aug[i + 2] = tmp_x;
-                            cur_label_aug[i + 3] = tmp_y;
-                        }
-                    }
-                }
-
-                // left-top coordinates of the crop [0;x_border] x [0;y_border]
-                int x0 = 0, y0 = 0;
-                x0 = rand() % (x_border + 1);
-                y0 = rand() % (y_border + 1);
-
-                // do crop
-                cv::Rect crop(x0, y0, size, size);
-
-                // NOTE: no full copy performed, so the original image buffer is affected by the transformations below
-                cv::Mat img_crop(img, crop);
-
-                // "crop" annotations
+                // "flip" annotation coordinates
                 for (int i = 0; i < label_num_channels; i += 2)
-                {
-                    cur_label_aug[i] -= (float)x0 / (float) multfact;
-                    cur_label_aug[i + 1] -= (float)y0 / (float) multfact;
-                }
-
-                // show image
-                if (visualise)
-                {
-                    DLOG(INFO) << "cropped image";
-                    cv::Mat img_vis_crop(img_vis, crop);
-                    cv::Mat img_res_vis = img_vis_crop / 255;
-                    cv::cvtColor(img_res_vis, img_res_vis, CV_RGB2BGR);
-                    this->VisualiseAnnotations(img_res_vis, label_num_channels, cur_label_aug, multfact);
-                    cv::imshow("cropped image", img_res_vis);
-                }
-
-                // rotations
-                float angle = Uniform(-angle_max, angle_max);
-                cv::Mat M = this->RotateImage(img_crop, angle);
-
-                // also flip & rotate labels
-                for (int i = 0; i < label_num_channels; i += 2)
-                {
-                    // convert to image space
-                    float x = cur_label_aug[i] * (float) multfact;
-                    float y = cur_label_aug[i + 1] * (float) multfact;
-
-                    // rotate
-                    cur_label_aug[i] = M.at<double>(0, 0) * x + M.at<double>(0, 1) * y + M.at<double>(0, 2);
-                    cur_label_aug[i + 1] = M.at<double>(1, 0) * x + M.at<double>(1, 1) * y + M.at<double>(1, 2);
-
-                    // convert back to joint space
-                    cur_label_aug[i] /= (float) multfact;
-                    cur_label_aug[i + 1] /= (float) multfact;
-                }
-
-                img_res = img_crop;
-            } else {
-                // determinsitic sampling
-                DLOG(INFO) << "deterministic crop sampling (centre)";
-
-                // centre crop
-                const int y0 = y_border / 2;
-                const int x0 = x_border / 2;
-
-                DLOG(INFO) << "cropping image from " << x0 << "x" << y0;
-
-                // do crop
-                cv::Rect crop(x0, y0, size, size);
-                cv::Mat img_crop(img, crop);
-
-                DLOG(INFO) << "cropping annotations.";
-
-                // "crop" annotations
-                for (int i = 0; i < label_num_channels; i += 2)
-                {
-                    cur_label_aug[i] -= (float)x0 / (float) multfact;
-                    cur_label_aug[i + 1] -= (float)y0 / (float) multfact;
-                }
-
-                if (visualise)
-                {
-                    cv::Mat img_vis_crop(img_vis, crop);
-                    cv::Mat img_res_vis = img_vis_crop.clone() / 255;
-                    cv::cvtColor(img_res_vis, img_res_vis, CV_RGB2BGR);
-                    this->VisualiseAnnotations(img_res_vis, label_num_channels, cur_label_aug, multfact);
-                    cv::imshow("cropped image", img_res_vis);
-                }
-                img_res = img_crop;
+                    cur_label_aug[i] = (float)width / (float)multfact - cur_label_aug[i];
             }
 
-            // show image
-            if (visualise)
-            {
-                cv::Mat img_res_vis = img_res / 255;
-                cv::cvtColor(img_res_vis, img_res_vis, CV_RGB2BGR);
-                this->VisualiseAnnotations(img_res_vis, label_num_channels, cur_label_aug, multfact);
-                cv::imshow("interim resize image", img_res_vis);
-            }
+            // FengyangZhang: don't do random crop
+            // if (random_crop)
+            // {
+            //     // random sampling
+            //     DLOG(INFO) << "random crop sampling";
+
+            //     // horizontal flip
+            //     if (rand() % 2)
+            //     {
+            //         // flip
+            //         cv::flip(img, img, 1);
+
+            //         if (visualise)
+            //             cv::flip(img_vis, img_vis, 1);
+
+            //         // "flip" annotation coordinates
+            //         for (int i = 0; i < label_num_channels; i += 2)
+            //             cur_label_aug[i] = (float)width / (float)multfact - cur_label_aug[i];
+
+            //         // "flip" annotation joint numbers
+            //         // assumes i=0,1 are for head, and i=2,3 left wrist, i=4,5 right wrist etc
+            //         // where coordinates are (x,y)
+            //         if (flip_joint_labels)
+            //         {
+            //             float tmp_x, tmp_y;
+            //             for (int i = flip_start_ind; i < label_num_channels; i += 4)
+            //             {
+            //                 CHECK_LT(i + 3, label_num_channels);
+            //                 tmp_x = cur_label_aug[i];
+            //                 tmp_y = cur_label_aug[i + 1];
+            //                 cur_label_aug[i] = cur_label_aug[i + 2];
+            //                 cur_label_aug[i + 1] = cur_label_aug[i + 3];
+            //                 cur_label_aug[i + 2] = tmp_x;
+            //                 cur_label_aug[i + 3] = tmp_y;
+            //             }
+            //         }
+            //     }
+
+            //     // left-top coordinates of the crop [0;x_border] x [0;y_border]
+            //     int x0 = 0, y0 = 0;
+            //     x0 = rand() % (x_border + 1);
+            //     y0 = rand() % (y_border + 1);
+
+            //     // do crop
+            //     cv::Rect crop(x0, y0, size, size);
+
+            //     // NOTE: no full copy performed, so the original image buffer is affected by the transformations below
+            //     cv::Mat img_crop(img, crop);
+
+            //     // "crop" annotations
+            //     for (int i = 0; i < label_num_channels; i += 2)
+            //     {
+            //         cur_label_aug[i] -= (float)x0 / (float) multfact;
+            //         cur_label_aug[i + 1] -= (float)y0 / (float) multfact;
+            //     }
+
+            //     // show image
+            //     if (visualise)
+            //     {
+            //         DLOG(INFO) << "cropped image";
+            //         cv::Mat img_vis_crop(img_vis, crop);
+            //         cv::Mat img_res_vis = img_vis_crop / 255;
+            //         cv::cvtColor(img_res_vis, img_res_vis, CV_RGB2BGR);
+            //         this->VisualiseAnnotations(img_res_vis, label_num_channels, cur_label_aug, multfact);
+            //         cv::imshow("cropped image", img_res_vis);
+            //     }
+
+            //     // rotations
+            //     float angle = Uniform(-angle_max, angle_max);
+            //     cv::Mat M = this->RotateImage(img_crop, angle);
+
+            //     // also flip & rotate labels
+            //     for (int i = 0; i < label_num_channels; i += 2)
+            //     {
+            //         // convert to image space
+            //         float x = cur_label_aug[i] * (float) multfact;
+            //         float y = cur_label_aug[i + 1] * (float) multfact;
+
+            //         // rotate
+            //         cur_label_aug[i] = M.at<double>(0, 0) * x + M.at<double>(0, 1) * y + M.at<double>(0, 2);
+            //         cur_label_aug[i + 1] = M.at<double>(1, 0) * x + M.at<double>(1, 1) * y + M.at<double>(1, 2);
+
+            //         // convert back to joint space
+            //         cur_label_aug[i] /= (float) multfact;
+            //         cur_label_aug[i + 1] /= (float) multfact;
+            //     }
+
+            //     img_res = img_crop;
+            // } else {
+            //     // determinsitic sampling
+            //     DLOG(INFO) << "deterministic crop sampling (centre)";
+
+            //     // centre crop
+            //     const int y0 = y_border / 2;
+            //     const int x0 = x_border / 2;
+
+            //     DLOG(INFO) << "cropping image from " << x0 << "x" << y0;
+
+            //     // do crop
+            //     cv::Rect crop(x0, y0, size, size);
+            //     cv::Mat img_crop(img, crop);
+
+            //     DLOG(INFO) << "cropping annotations.";
+
+            //     // "crop" annotations
+            //     for (int i = 0; i < label_num_channels; i += 2)
+            //     {
+            //         cur_label_aug[i] -= (float)x0 / (float) multfact;
+            //         cur_label_aug[i + 1] -= (float)y0 / (float) multfact;
+            //     }
+
+            //     if (visualise)
+            //     {
+            //         cv::Mat img_vis_crop(img_vis, crop);
+            //         cv::Mat img_res_vis = img_vis_crop.clone() / 255;
+            //         cv::cvtColor(img_res_vis, img_res_vis, CV_RGB2BGR);
+            //         this->VisualiseAnnotations(img_res_vis, label_num_channels, cur_label_aug, multfact);
+            //         cv::imshow("cropped image", img_res_vis);
+            //     }
+            //     img_res = img_crop;
+            // }
+
+            // // show image
+            // if (visualise)
+            // {
+            //     cv::Mat img_res_vis = img_res / 255;
+            //     cv::cvtColor(img_res_vis, img_res_vis, CV_RGB2BGR);
+            //     this->VisualiseAnnotations(img_res_vis, label_num_channels, cur_label_aug, multfact);
+            //     cv::imshow("interim resize image", img_res_vis);
+            // }
 
             DLOG(INFO) << "Resizing output image.";
 
             // resize to output image size
+            float resizeFact_x = (float)outsize / (float)img_res.cols;
+            float resizeFact_y = (float)outsize / (float)img_res.rows;
+
             cv::Size s(outsize, outsize);
             cv::resize(img_res, img_res, s);
 
             // "resize" annotations
-            for (int i = 0; i < label_num_channels; i++)
-                cur_label_aug[i] *= resizeFact;
+            for (int i = 0; i < label_num_channels; i+=2)
+                cur_label_aug[i] *= resizeFact_x;
 
-            // show image
-            if (visualise)
-            {
-                cv::Mat img_res_vis = img_res / 255;
-                cv::cvtColor(img_res_vis, img_res_vis, CV_RGB2BGR);
-                this->VisualiseAnnotations(img_res_vis, label_num_channels, cur_label_aug, multfact);
-                cv::imshow("resulting image", img_res_vis);
-            }
-
-            // show image
-            if (visualise && sub_mean)
-            {
-                cv::Mat img_res_meansub_vis = img_res / 255;
-                cv::cvtColor(img_res_meansub_vis, img_res_meansub_vis, CV_RGB2BGR);
-                cv::imshow("mean-removed image", img_res_meansub_vis);
-            }
+            for (int i = 1; i < label_num_channels; i+=2)
+                cur_label_aug[i] *= resizeFact_y;
 
             // multiply by scale
             if (scale != 1.0)
