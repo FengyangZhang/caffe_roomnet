@@ -136,7 +136,6 @@ layer {
 layer {
   bottom: "conv1_2"
   top: "pool1"
-  top: "pool1_mask"
   name: "pool1"
   type: "Pooling"
   pooling_param {
@@ -258,7 +257,6 @@ layer {
 layer {
   bottom: "conv2_2"
   top: "pool2"
-  top: "pool2_mask"
   name: "pool2"
   type: "Pooling"
   pooling_param {
@@ -435,7 +433,6 @@ layer {
 layer {
   bottom: "conv3_3"
   top: "pool3"
-  top: "pool3_mask"
   name: "pool3"
   type: "Pooling"
   pooling_param {
