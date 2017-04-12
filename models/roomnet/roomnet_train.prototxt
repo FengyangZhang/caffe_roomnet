@@ -1388,7 +1388,7 @@ layer {
   type: "SoftmaxWithLoss"
   bottom: "fc_11"
   bottom: "type"
-  top: "loss"
+  top: "type_loss"
   softmax_param {
     engine: CAFFE
   }
