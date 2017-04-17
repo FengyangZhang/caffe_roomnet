@@ -1371,15 +1371,15 @@ layer {
   name: "relu_final_48_D"
   type: "ReLU"
 }
-layer {
-  name: "keypoint_loss"
-  type: "EuclideanLossHeatmap"
-  bottom: "conv_final_48_D"
-  bottom: "heatmap_gt"
-  bottom: "fc_11"
-  top: "keypoint_loss"
-  loss_weight: 1
-}
+# layer {
+#   name: "keypoint_loss"
+#   type: "EuclideanLossHeatmap"
+#   bottom: "conv_final_48_D"
+#   bottom: "heatmap_gt"
+#   bottom: "fc_11"
+#   top: "keypoint_loss"
+#   loss_weight: 0.2
+# }
 layer {
   name: "type_loss"
   type: "SoftmaxWithLoss"
@@ -1389,5 +1389,5 @@ layer {
   softmax_param {
     engine: CAFFE
   }
-  loss_weight: 5
+  loss_weight: 0.8
 }

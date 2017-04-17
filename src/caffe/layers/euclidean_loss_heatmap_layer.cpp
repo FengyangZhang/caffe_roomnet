@@ -100,7 +100,11 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
         //int begin_ptr = type_prob_pred + num_types * idx_img;
 		//int end_ptr = type_prob_pred + num_types * (idx_img + 1);
         int type_pred = std::distance(type_prob_pred+offset, std::max_element(type_prob_pred+offset, type_prob_pred+offset+num_types));
-        DLOG(INFO) << "+++++++++++++type_pred:" << type_pred;
+		for(int index = 0; index < 11; index++)
+		{	
+        	DLOG(INFO) << "++++++pred values:" << *(type_prob_pred + offset + index);
+		}
+		DLOG(INFO) << "+++++++++++++type_pred:" << type_pred;
         DLOG(INFO) << "+++++++++++++offset:" << offset;
 		DLOG(INFO) << "+++++++++++++max_element:" << *std::max_element(type_prob_pred + offset, type_prob_pred + offset + num_types);
         // Compute loss (only those channels of the predicted layout type)
