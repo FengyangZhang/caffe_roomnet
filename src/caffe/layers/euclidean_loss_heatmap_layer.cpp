@@ -51,21 +51,9 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
 
     const Dtype* bottom_pred = bottom[0]->cpu_data(); // predictions for all images
     const Dtype* gt_pred = bottom[1]->cpu_data();    // GT predictions
-    const Dtype* type_prob_pred = bottom[2]->cpu_data();  // Type prob predictions
+    const Dtype* type_gt = bottom[2]->cpu_data();  // gt type
     // range of indices of heatmaps for each predicted type of image
     const int type_ind_range[12] = {0, 8, 14, 20, 24, 28, 34, 38, 42, 44, 46, 48};
-	//const vector< pair<int, int> > type_ind_range;
-    //type_ind_range.push_back(std::make_pair(0, 7));
-    //type_ind_range.push_back(std::make_pair(8, 13));
-    //type_ind_range.push_back(std::make_pair(14, 19));
-    //type_ind_range.push_back(std::make_pair(20, 23));
-    //type_ind_range.push_back(std::make_pair(24, 27));
-    //type_ind_range.push_back(std::make_pair(28, 33));
-    //type_ind_range.push_back(std::make_pair(34, 37));
-    //type_ind_range.push_back(std::make_pair(38, 41));
-    //type_ind_range.push_back(std::make_pair(42, 43));
-    //type_ind_range.push_back(std::make_pair(44, 45));
-    //type_ind_range.push_back(std::make_pair(46, 47));
 
     const int num_images = bottom[1]->num();
     const int label_height = bottom[1]->height();
@@ -97,19 +85,11 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
     for (int idx_img = 0; idx_img < num_images; idx_img++)
     {
         // find predicted type indice
-        int offset = num_types * idx_img;
-        //int begin_ptr = type_prob_pred + num_types * idx_img;
-		//int end_ptr = type_prob_pred + num_types * (idx_img + 1);
-        int type_pred = std::distance(type_prob_pred+offset, std::max_element(type_prob_pred+offset, type_prob_pred+offset+num_types));
-		//for(int index = 0; index < 11; index++)
-		//{	
-        //	DLOG(INFO) << "++++++pred values:" << *(type_prob_pred + offset + index);
-		//}
-		DLOG(INFO) << "+++++++++++++type_pred:" << type_pred;
-        //DLOG(INFO) << "+++++++++++++offset:" << offset;
-		//DLOG(INFO) << "+++++++++++++max_element:" << *std::max_element(type_prob_pred + offset, type_prob_pred + offset + num_types);
+        // int offset = num_types * idx_img;
+        // int type_pred = std::distance(type_prob_pred+offset, std::max_element(type_prob_pred+offset, type_prob_pred+offset+num_types));
+		// DLOG(INFO) << "+++++++++++++type_pred:" << type_pred;
         // Compute loss (only those channels of the predicted layout type)
-        for (int idx_ch = type_ind_range[type_pred]; idx_ch <= type_ind_range[type_pred+1] - 1; idx_ch++)
+        for (int idx_ch = type_ind_range[type_gt[idx_img] ]; idx_ch <= type_ind_range[type_gt[idx_img]+1] - 1; idx_ch++)
         {
             for (int i = 0; i < label_height; i++)
             {

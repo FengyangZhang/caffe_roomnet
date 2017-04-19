@@ -1376,7 +1376,7 @@ layer {
   type: "EuclideanLossHeatmap"
   bottom: "conv_final_48_D"
   bottom: "heatmap_gt"
-  bottom: "fc_11"
+  bottom: "type"
   top: "keypoint_loss"
   loss_weight: 0.2
 }
