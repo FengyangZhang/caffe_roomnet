@@ -124,6 +124,9 @@ void RoomnetPrefetchingDataLayer<Dtype>::Forward_cpu(
   caffe_copy(batch->type_.count(), batch->type_.cpu_data(),
              top[2]->mutable_cpu_data());
   prefetch_free_.push(batch);
+  top[0]->set_cpu_data(prefetch_free_->data_.mutable_cpu_data());
+  top[1]->set_cpu_data(prefetch_free_->label_.mutable_cpu_data());
+  top[2]->set_cpu_data(prefetch_free_->type_.mutable_cpu_data());
 }
 
 #ifdef CPU_ONLY
