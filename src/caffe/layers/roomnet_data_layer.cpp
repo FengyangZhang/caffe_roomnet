@@ -49,6 +49,7 @@ void RoomnetPrefetchingDataLayer<Dtype>::LayerSetUp(
   // seems to cause failures if we do not so.
   for (int i = 0; i < PREFETCH_COUNT; ++i) {
     prefetch_[i].data_.mutable_cpu_data();
+    prefetch_[i].type_.mutable_cpu_data();
     if (this->output_labels_) {
       prefetch_[i].label_.mutable_cpu_data();
     }
@@ -57,6 +58,7 @@ void RoomnetPrefetchingDataLayer<Dtype>::LayerSetUp(
   if (Caffe::mode() == Caffe::GPU) {
     for (int i = 0; i < PREFETCH_COUNT; ++i) {
       prefetch_[i].data_.mutable_gpu_data();
+      prefetch_[i].type_.mutable_gpu_data();
       if (this->output_labels_) {
         prefetch_[i].label_.mutable_gpu_data();
       }
@@ -117,7 +119,10 @@ void RoomnetPrefetchingDataLayer<Dtype>::Forward_cpu(
     caffe_copy(batch->label_.count(), batch->label_.cpu_data(),
         top[1]->mutable_cpu_data());
   }
-
+  top[2]->ReshapeLike(batch->type_);
+  // Copy the type
+  caffe_copy(batch->type_.count(), batch->type_.cpu_data(),
+             top[2]->mutable_cpu_data());
   prefetch_free_.push(batch);
 }
 
