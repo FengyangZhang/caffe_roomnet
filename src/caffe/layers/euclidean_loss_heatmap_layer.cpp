@@ -120,21 +120,33 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
                     float diff = (float)bottom_pred[image_idx] - (float)gt_pred[image_idx];
                     loss += diff * diff;
                     diff_.mutable_cpu_data()[image_idx] = diff;
-
+					
                     // Store visualisation for given channel
-                    if (idx_ch == visualise_channel)
-                    {
-                        bottom_img.at<float>((int)j, (int)i) = (float) bottom_pred[image_idx];
-                        gt_img.at<float>((int)j, (int)i) = (float) gt_pred[image_idx];
-                        diff_img.at<float>((int)j, (int)i) = (float) diff * diff;
-                    }
-
+                    // if (idx_ch == 0)
+                    // {
+					// 	if(bottom_pred[image_idx] != 0)
+					// 	{
+					// 		DLOG(INFO) << "bottom_pred" << bottom_pred[image_idx];
+					// 	}
+					// 	if(gt_pred[image_idx] != 0)
+					// 	{
+					// 		DLOG(INFO) << "gt_pred" << gt_pred[image_idx];
+					// 	}
+                    //     // bottom_img.at<float>((int)j, (int)i) = (float) bottom_pred[image_idx];
+                    //     // gt_img.at<float>((int)j, (int)i) = (float) gt_pred[image_idx];
+                    //     // diff_img.at<float>((int)j, (int)i) = (float) diff * diff;
+					// 	//DLOG(INFO) << "Point 2";	
+                    // }
                 }
             }
         }
-        cv::imwrite("test/" + std::to_string(index) + ".jpg", bottom_img);
-        cv::imwrite("test/" + std::to_string(index) + "gt.jpg", gt_img);
-        index++;
+		// std::stringstream ss;
+		// ss << index;
+		// string str = ss.str();
+		// DLOG(INFO) << "~~~~~~~~~~~~~~";
+        // cv::imwrite("test/" + str + ".jpg", bottom_img);
+        // cv::imwrite("test/" + str + "gt.jpg", gt_img);
+        // index++;
         // Plot visualisation
         if (visualise)
         {

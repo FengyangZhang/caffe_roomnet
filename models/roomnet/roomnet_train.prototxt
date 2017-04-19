@@ -7,8 +7,8 @@ layer {
   top: "type"
   visualise: false   
   heatmap_data_param {
-    source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/train.txt"
-    root_img_dir: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/images/"
+    source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/training.txt"
+    root_img_dir: "/data01/vision_rd/zhangfengyang/roomnet/LSUN/images/"
     batchsize: 10
     cropsize: 320
     outsize: 320
@@ -1378,8 +1378,7 @@ layer {
   bottom: "heatmap_gt"
   bottom: "fc_11"
   top: "keypoint_loss"
-  loss_weight: 0.9
-  visualize_channel: 0
+  loss_weight: 0.2
 }
 layer {
   name: "type_loss"
@@ -1390,5 +1389,5 @@ layer {
   softmax_param {
     engine: CAFFE
   }
-  loss_weight: 0.1
+  loss_weight: 0.8
 }
