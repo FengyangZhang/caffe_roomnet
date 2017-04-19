@@ -9,7 +9,7 @@ layer {
   heatmap_data_param {
     source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/train.txt"
     root_img_dir: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/images/"
-    batchsize: 4
+    batchsize: 10
     cropsize: 320
     outsize: 320
     sample_per_cluster: false
@@ -1371,15 +1371,15 @@ layer {
   name: "relu_final_48_D"
   type: "ReLU"
 }
-# layer {
-#   name: "keypoint_loss"
-#   type: "EuclideanLossHeatmap"
-#   bottom: "conv_final_48_D"
-#   bottom: "heatmap_gt"
-#   bottom: "fc_11"
-#   top: "keypoint_loss"
-#   loss_weight: 0.2
-# }
+layer {
+  name: "keypoint_loss"
+  type: "EuclideanLossHeatmap"
+  bottom: "conv_final_48_D"
+  bottom: "heatmap_gt"
+  bottom: "fc_11"
+  top: "keypoint_loss"
+  loss_weight: 0.9
+}
 layer {
   name: "type_loss"
   type: "SoftmaxWithLoss"
@@ -1389,5 +1389,5 @@ layer {
   softmax_param {
     engine: CAFFE
   }
-  loss_weight: 0.8
+  loss_weight: 0.1
 }

@@ -109,6 +109,7 @@ void SoftmaxWithLossLayer<Dtype>::Forward_cpu(
     }
   }
   top[0]->mutable_cpu_data()[0] = loss / get_normalizer(normalization_, count);
+  DLOG(INFO) << "Softmax head loss:" << loss / get_normalizer(normalization_, count);
   if (top.size() == 2) {
     top[1]->ShareData(prob_);
   }

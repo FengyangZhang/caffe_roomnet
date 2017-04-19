@@ -460,7 +460,7 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             std::vector<float> cur_label_aug = cur_label;
 
             // store image type
-            DLOG(INFO) << "storing type";
+            DLOG(INFO) << "storing type:" << cur_type;
             top_type[idx_img_aug] = cur_type;
 
             // FengyangZhang: do random horizontal flip
