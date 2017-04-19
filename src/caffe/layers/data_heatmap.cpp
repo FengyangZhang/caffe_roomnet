@@ -91,18 +91,6 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
                 }
                 labelCounter++;
             }
-
-            // read cropping info
-            // std::vector <float> cropInfo;
-            // std::istringstream ss2(cropInfos);
-            // while (ss2)
-            // {
-            //     std::string s;
-            //     if (!std::getline(ss2, s, ',')) break;
-            //     cropInfo.push_back(atof(s.c_str()));
-            // }
-
-            // int clusterClass = atoi(clusterClassStr.c_str());
             int type = atoi(typeStr.c_str());
             img_label_list_.push_back(std::make_pair(img_name, std::make_pair(label, type)));
         }
@@ -249,10 +237,7 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     this->datum_size_ = this->datum_channels_ * outsize * outsize;
 
     // init label
-    int label_num_channels = img_label_list_[0].second.first.size();
-    // else
-    //     label_num_channels = img_list_[0][0].second.first.size();
-    label_num_channels /= 2;
+    int label_num_channels = 48;
     top[1]->Reshape(batchsize, label_num_channels, label_height, label_width);
     for (int i = 0; i < this->PREFETCH_COUNT; ++i)
         this->prefetch_[i].label_.Reshape(batchsize, label_num_channels, label_height, label_width);
@@ -336,7 +321,8 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         this->GetCurImg(img_name, cur_label, cur_type);
 
         // get number of channels for image label
-        int label_num_channels = cur_label.size();
+        int label_num_valid_channels = cur_label.size();
+        int label_num_channels = 48;
 
         std::string img_path = this->root_img_dir_ + img_name;
         DLOG(INFO) << "img: " << img_path;
@@ -470,7 +456,7 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 cv::flip(img, img, 1);
 
                 // "flip" annotation coordinates
-                for (int i = 0; i < label_num_channels; i += 2)
+                for (int i = 0; i < label_num_valid_channels; i += 2)
                     cur_label_aug[i] = (float)width / (float)multfact - cur_label_aug[i];
             }
 
@@ -615,10 +601,10 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             cv::resize(img, img_res, s);
     
             // "resize" annotations
-            for (int i = 0; i < label_num_channels; i+=2)
+            for (int i = 0; i < label_num_valid_channels; i+=2)
                 cur_label_aug[i] *= resizeFact_x;
 
-            for (int i = 1; i < label_num_channels; i+=2)
+            for (int i = 1; i < label_num_valid_channels; i+=2)
                 cur_label_aug[i] *= resizeFact_y;
 
             // multiply by scale
@@ -643,8 +629,8 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             }
 
             const int type_ind_range[12] = {0, 8, 14, 20, 24, 28, 34, 38, 42, 44, 46, 48};
-            int low_indice = type_ind_range[cur_type]
-            int high_indice = type_ind_range[cur_type + 1]
+            int low_indice = type_ind_range[cur_type];
+            int high_indice = type_ind_range[cur_type + 1];
             // store label as gaussian
             DLOG(INFO) << "storing labels";
             const int label_channel_size = label_height * label_width;
