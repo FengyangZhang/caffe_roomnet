@@ -634,7 +634,7 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             // store label as gaussian
             DLOG(INFO) << "storing labels";
             const int label_channel_size = label_height * label_width;
-            const int label_img_size = label_channel_size * label_num_channels / 2;
+            const int label_img_size = label_channel_size * label_num_channels;
             float label_resize_fact = (float) label_height / (float) outsize;
             float sigma = 1.5;
 

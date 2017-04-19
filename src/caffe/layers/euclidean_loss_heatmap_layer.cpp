@@ -122,21 +122,21 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
                     diff_.mutable_cpu_data()[image_idx] = diff;
 					
                     // Store visualisation for given channel
-                    // if (idx_ch == 0)
-                    // {
-					// 	if(bottom_pred[image_idx] != 0)
-					// 	{
-					// 		DLOG(INFO) << "bottom_pred" << bottom_pred[image_idx];
-					// 	}
-					// 	if(gt_pred[image_idx] != 0)
-					// 	{
-					// 		DLOG(INFO) << "gt_pred" << gt_pred[image_idx];
-					// 	}
-                    //     // bottom_img.at<float>((int)j, (int)i) = (float) bottom_pred[image_idx];
-                    //     // gt_img.at<float>((int)j, (int)i) = (float) gt_pred[image_idx];
-                    //     // diff_img.at<float>((int)j, (int)i) = (float) diff * diff;
-					// 	//DLOG(INFO) << "Point 2";	
-                    // }
+                    if (idx_ch == 10)
+                    {
+						//if(bottom_pred[image_idx] != 0)
+						//{
+						//	DLOG(INFO) << "bottom_pred" << bottom_pred[image_idx];
+						//}
+						//if(gt_pred[image_idx] != 0)
+						//{
+						//	DLOG(INFO) << "gt_pred" << gt_pred[image_idx];
+						//}
+                        // bottom_img.at<float>((int)j, (int)i) = (float) bottom_pred[image_idx];
+                        // gt_img.at<float>((int)j, (int)i) = (float) gt_pred[image_idx];
+                        // diff_img.at<float>((int)j, (int)i) = (float) diff * diff;
+						//DLOG(INFO) << "Point 2";	
+                    }
                 }
             }
         }
