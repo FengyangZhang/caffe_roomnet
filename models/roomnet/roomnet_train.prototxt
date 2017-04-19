@@ -1379,6 +1379,7 @@ layer {
   bottom: "fc_11"
   top: "keypoint_loss"
   loss_weight: 0.9
+  visualize_channel: 0
 }
 layer {
   name: "type_loss"

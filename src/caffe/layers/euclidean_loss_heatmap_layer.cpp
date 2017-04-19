@@ -92,6 +92,7 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
         diff_img = cv::Mat::zeros(label_height, label_width, CV_32FC1);
     }
 
+    int index = 0;
     // Loop over images
     for (int idx_img = 0; idx_img < num_images; idx_img++)
     {
@@ -121,7 +122,7 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
                     diff_.mutable_cpu_data()[image_idx] = diff;
 
                     // Store visualisation for given channel
-                    if (idx_ch == visualise_channel && visualise)
+                    if (idx_ch == visualise_channel)
                     {
                         bottom_img.at<float>((int)j, (int)i) = (float) bottom_pred[image_idx];
                         gt_img.at<float>((int)j, (int)i) = (float) gt_pred[image_idx];
@@ -131,17 +132,18 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
                 }
             }
         }
+        cv::imwrite("test/" + std::to_string(index) + ".jpg", bottom_img);
+        cv::imwrite("test/" + std::to_string(index) + "gt.jpg", gt_img);
+        index++;
         // Plot visualisation
         if (visualise)
         {
-//            DLOG(INFO) << "num_images=" << num_images << " idx_img=" << idx_img;
-//            DLOG(INFO) << "sum bottom: " << cv::sum(bottom_img) << "  sum gt: " << cv::sum(gt_img);
-            int visualisation_size = 256;
+            int visualisation_size = 40;
             cv::Size size(visualisation_size, visualisation_size);            
             std::vector<cv::Point> points;
             this->Visualise(loss, bottom_img, gt_img, diff_img, points, size);
             this->VisualiseBottom(bottom, idx_img, visualise_channel, points, size);
-            cv::waitKey(0);     // Wait forever a key is pressed
+            cv::waitKey(0);
         }
     }
 
