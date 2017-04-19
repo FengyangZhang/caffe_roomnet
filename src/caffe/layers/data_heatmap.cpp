@@ -642,18 +642,21 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 }
             }
 
+            const int type_ind_range[12] = {0, 8, 14, 20, 24, 28, 34, 38, 42, 44, 46, 48};
+            int low_indice = type_ind_range[cur_type]
+            int high_indice = type_ind_range[cur_type + 1]
             // store label as gaussian
             DLOG(INFO) << "storing labels";
             const int label_channel_size = label_height * label_width;
             const int label_img_size = label_channel_size * label_num_channels / 2;
-            cv::Mat dataMatrix = cv::Mat::zeros(label_height, label_width, CV_32FC1);
             float label_resize_fact = (float) label_height / (float) outsize;
             float sigma = 1.5;
 
-            for (int idx_ch = 0; idx_ch < label_num_channels / 2; idx_ch++)
+            // set ground truth label on corresponding channels
+            for (int idx_ch = low_indice; idx_ch < high_indice; idx_ch++)
             {
-                float x = label_resize_fact * cur_label_aug[2 * idx_ch] * multfact;
-                float y = label_resize_fact * cur_label_aug[2 * idx_ch + 1] * multfact;
+                float x = label_resize_fact * cur_label_aug[2*(idx_ch-low_indice)] * multfact;
+                float y = label_resize_fact * cur_label_aug[2*(idx_ch-low_indice)+1] * multfact;
                 for (int i = 0; i < label_height; i++)
                 {
                     for (int j = 0; j < label_width; j++)
@@ -662,9 +665,30 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                         float gaussian = ( 1 / ( sigma * sqrt(2 * M_PI) ) ) * exp( -0.5 * ( pow(i - y, 2.0) + pow(j - x, 2.0) ) * pow(1 / sigma, 2.0) );
                         gaussian = 4 * gaussian;
                         top_label[label_idx] = gaussian;
+                    }
+                }
+            }
 
-                        if (idx_ch == 0)
-                            dataMatrix.at<float>((int)j, (int)i) = gaussian;
+            // set ground truth value on unrelated channels to zero
+            for (int idx_ch = 0; idx_ch < low_indice; idx_ch++)
+            {
+                for (int i = 0; i < label_height; i++)
+                {
+                    for (int j = 0; j < label_width; j++)
+                    {
+                        int label_idx = idx_img_aug * label_img_size + idx_ch * label_channel_size + i * label_height + j;
+                        top_label[label_idx] = 0;
+                    }
+                }
+            }
+            for (int idx_ch = high_indice; idx_ch < 48; idx_ch++)
+            {
+                for (int i = 0; i < label_height; i++)
+                {
+                    for (int j = 0; j < label_width; j++)
+                    {
+                        int label_idx = idx_img_aug * label_img_size + idx_ch * label_channel_size + i * label_height + j;
+                        top_label[label_idx] = 0;
                     }
                 }
             }
