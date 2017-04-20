@@ -89,7 +89,9 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
         // int type_pred = std::distance(type_prob_pred+offset, std::max_element(type_prob_pred+offset, type_prob_pred+offset+num_types));
 		// DLOG(INFO) << "+++++++++++++type_pred:" << type_pred;
         // Compute loss (only those channels of the predicted layout type)
-        for (int idx_ch = type_ind_range[type_gt[idx_img] ]; idx_ch <= type_ind_range[type_gt[idx_img]+1] - 1; idx_ch++)
+        DLOG(INFO) << "The ground truth type is:" << type_gt[idx_img];
+		int type_int = (int)type_gt[idx_img];
+        for (int idx_ch = type_ind_range[type_int]; idx_ch <= type_ind_range[type_int+1] - 1; idx_ch++)
         {
             for (int i = 0; i < label_height; i++)
             {
@@ -139,9 +141,9 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
         }
     }
 
-    DLOG(INFO) << "total loss: " << loss;
+    DLOG(INFO) << "Euclidean head total loss: " << loss;
     loss /= (num_images * num_channels * label_channel_size);
-    DLOG(INFO) << "total normalised loss: " << loss;
+    DLOG(INFO) << "Euclidean head total normalised loss: " << loss;
 
     top[0]->mutable_cpu_data()[0] = loss;
 }

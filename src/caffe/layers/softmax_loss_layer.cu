@@ -61,6 +61,7 @@ void SoftmaxWithLossLayer<Dtype>::Forward_gpu(
   if (top.size() == 2) {
     top[1]->ShareData(prob_);
   }
+  DLOG(INFO) << "Softmax head loss:" << loss / get_normalizer(normalization_, valid_count);
 }
 
 template <typename Dtype>
