@@ -1,5 +1,12 @@
-# Caffe
+# Caffe_Roomnet
 
+A CNN-based neural network for layout estimation from a monocular vision image. Still under development...
+
+## Roomnet paper
+
+Find the original paper here: [Chen-Yu Lee et. al., RoomNet: End-to-End Room Layout Estimation, arXiv:1703.06241](https://arxiv.org/abs/1703.06241)
+
+## Caffe
 [![Build Status](https://travis-ci.org/BVLC/caffe.svg?branch=master)](https://travis-ci.org/BVLC/caffe)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](LICENSE)
 
