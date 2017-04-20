@@ -7,7 +7,7 @@ layer {
   top: "type"
   visualise: false   
   heatmap_data_param {
-    source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/testing.txt"
+    source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/training_five.txt"
     root_img_dir: "/data01/vision_rd/zhangfengyang/roomnet/LSUN/images/"
     batchsize: 1
     cropsize: 320
@@ -1397,6 +1397,9 @@ layer {
   bottom: "heatmap_gt"
   bottom: "type"
   top: "keypoint_loss"
+  euclidean_heatmap_parameter {
+    is_test: true 
+  }
 }
 layer {
   name: "prob"

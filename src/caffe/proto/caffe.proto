@@ -806,7 +806,7 @@ message UpsampleParameter {
 }
 
 message EuclideanHeatmapParameter {
-optional is_test = 1 [default = false];
+  optional bool is_test = 1 [default = false];
 }
 
 message BNParameter {
