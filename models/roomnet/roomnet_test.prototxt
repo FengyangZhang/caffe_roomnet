@@ -60,16 +60,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv1_1"
@@ -116,16 +116,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+        value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv1_2"
@@ -183,16 +183,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv2_1"
@@ -239,16 +239,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv2_2"
@@ -306,16 +306,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv3_1"
@@ -362,16 +362,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv3_2"
@@ -418,16 +418,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv3_3"
@@ -494,16 +494,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv4_1"
@@ -550,16 +550,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv4_2"
@@ -606,16 +606,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv4_3"
@@ -683,16 +683,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv5_1"
@@ -739,16 +739,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv5_2"
@@ -795,16 +795,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv5_3"
@@ -959,16 +959,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv5_3_D"
@@ -1016,16 +1016,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv5_2_D"
@@ -1072,16 +1072,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv5_1_D"
@@ -1149,16 +1149,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv4_3_D"
@@ -1205,16 +1205,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv4_2_D"
@@ -1261,16 +1261,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv4_1_D"
@@ -1317,16 +1317,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv_final_64_D"
@@ -1373,16 +1373,16 @@ layer {
     decay_mult: 0
   }
   bn_param {
-  bn_mode: INFERENCE
-  scale_filler {
-    type: "constant"
-    value: 1
+    bn_mode: INFERENCE
+    scale_filler {
+      type: "constant"
+      value: 1
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv_final_48_D"
@@ -1398,7 +1398,7 @@ layer {
   bottom: "type"
   top: "keypoint_loss"
   euclidean_heatmap_parameter {
-    is_test: true 
+    is_test: true
   }
 }
 layer {
