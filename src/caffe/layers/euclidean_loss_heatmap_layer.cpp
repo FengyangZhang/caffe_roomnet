@@ -34,9 +34,11 @@ void EuclideanLossHeatmapLayer<Dtype>::Reshape(
 template<typename Dtype>
 void EuclideanLossHeatmapLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top)
 {
-    if (this->layer_param_.loss_weight_size() == 0) {
-        this->layer_param_.add_loss_weight(Dtype(1));
+    EuclideanLossHeatmapParameter euclidean_heatmap_param = this->layer_param_.euclidean_heatmap_param();
+    if (euclidean_heatmap_param.loss_weight_size() == 0) {
+        euclidean_heatmap_param.add_loss_weight(Dtype(1));
     }
+
 
 }
 
@@ -46,8 +48,7 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
 {
     Dtype loss = 0;
 
-    int visualise_channel = this->layer_param_.visualise_channel();
-    bool visualise = this->layer_param_.visualise();
+    bool visualise = euclidean_heatmap_param.visualise();
 
     const Dtype* bottom_pred = bottom[0]->cpu_data(); // predictions for all images
     const Dtype* gt_pred = bottom[1]->cpu_data();    // GT predictions
@@ -70,11 +71,6 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
 
     if (visualise)
     {
-        cv::namedWindow("bottom", CV_WINDOW_AUTOSIZE);
-        cv::namedWindow("gt", CV_WINDOW_AUTOSIZE);
-        cv::namedWindow("diff", CV_WINDOW_AUTOSIZE);
-        cv::namedWindow("overlay", CV_WINDOW_AUTOSIZE);
-        cv::namedWindow("visualisation_bottom", CV_WINDOW_AUTOSIZE);
         bottom_img = cv::Mat::zeros(label_height, label_width, CV_32FC1);
         gt_img = cv::Mat::zeros(label_height, label_width, CV_32FC1);
         diff_img = cv::Mat::zeros(label_height, label_width, CV_32FC1);
@@ -129,16 +125,6 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
         // cv::imwrite("test/" + str + ".jpg", bottom_img);
         // cv::imwrite("test/" + str + "gt.jpg", gt_img);
         // index++;
-        // Plot visualisation
-        if (visualise)
-        {
-            int visualisation_size = 40;
-            cv::Size size(visualisation_size, visualisation_size);            
-            std::vector<cv::Point> points;
-            this->Visualise(loss, bottom_img, gt_img, diff_img, points, size);
-            this->VisualiseBottom(bottom, idx_img, visualise_channel, points, size);
-            cv::waitKey(0);
-        }
     }
 
     DLOG(INFO) << "Euclidean head total loss: " << loss;
