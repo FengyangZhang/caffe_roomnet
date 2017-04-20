@@ -48,6 +48,7 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
 
     int visualise_channel = this->layer_param_.visualise_channel();
     bool visualise = this->layer_param_.visualise();
+    bool is_test = this->layer_param.euclidean_heatmap_parameter().is_test();
 
     const Dtype* bottom_pred = bottom[0]->cpu_data(); // predictions for all images
     const Dtype* gt_pred = bottom[1]->cpu_data();    // GT predictions
@@ -68,19 +69,13 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
     const int label_img_size = label_channel_size * num_channels;
     cv::Mat bottom_img, gt_img, diff_img;  // Initialise opencv images for visualisation
 
-    if (visualise)
+    if (is_test)
     {
-        cv::namedWindow("bottom", CV_WINDOW_AUTOSIZE);
-        cv::namedWindow("gt", CV_WINDOW_AUTOSIZE);
-        cv::namedWindow("diff", CV_WINDOW_AUTOSIZE);
-        cv::namedWindow("overlay", CV_WINDOW_AUTOSIZE);
-        cv::namedWindow("visualisation_bottom", CV_WINDOW_AUTOSIZE);
         bottom_img = cv::Mat::zeros(label_height, label_width, CV_32FC1);
         gt_img = cv::Mat::zeros(label_height, label_width, CV_32FC1);
         diff_img = cv::Mat::zeros(label_height, label_width, CV_32FC1);
     }
 
-    int index = 0;
     // Loop over images
     for (int idx_img = 0; idx_img < num_images; idx_img++)
     {
@@ -104,40 +99,18 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
                     diff_.mutable_cpu_data()[image_idx] = diff;
 					
                     // Store visualisation for given channel
-                    if (idx_ch == 10)
-                    {
-						//if(bottom_pred[image_idx] != 0)
-						//{
-						//	DLOG(INFO) << "bottom_pred" << bottom_pred[image_idx];
-						//}
-						//if(gt_pred[image_idx] != 0)
-						//{
-						//	DLOG(INFO) << "gt_pred" << gt_pred[image_idx];
-						//}
-                        // bottom_img.at<float>((int)j, (int)i) = (float) bottom_pred[image_idx];
-                        // gt_img.at<float>((int)j, (int)i) = (float) gt_pred[image_idx];
-                        // diff_img.at<float>((int)j, (int)i) = (float) diff * diff;
-						//DLOG(INFO) << "Point 2";	
+                    if(is_test) {
+                        bottom_img.at<float>((int)j, (int)i) = (float) bottom_pred[image_idx];
+                        gt_img.at<float>((int)j, (int)i) = (float) gt_pred[image_idx];
+                        diff_img.at<float>((int)j, (int)i) = (float) diff * diff;
                     }
                 }
             }
-        }
-		// std::stringstream ss;
-		// ss << index;
-		// string str = ss.str();
-		// DLOG(INFO) << "~~~~~~~~~~~~~~";
-        // cv::imwrite("test/" + str + ".jpg", bottom_img);
-        // cv::imwrite("test/" + str + "gt.jpg", gt_img);
-        // index++;
-        // Plot visualisation
-        if (visualise)
-        {
-            int visualisation_size = 40;
-            cv::Size size(visualisation_size, visualisation_size);            
-            std::vector<cv::Point> points;
-            this->Visualise(loss, bottom_img, gt_img, diff_img, points, size);
-            this->VisualiseBottom(bottom, idx_img, visualise_channel, points, size);
-            cv::waitKey(0);
+            std::stringstream ss;
+            ss << type_gt[idx_img] << "-" << idx_ch;
+            string str = ss.str();
+            cv::imwrite("test/" + str + ".jpg", bottom_img);
+            cv::imwrite("test/" + str + "gt.jpg", gt_img);
         }
     }
 

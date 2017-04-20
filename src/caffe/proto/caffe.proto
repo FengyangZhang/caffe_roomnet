@@ -413,6 +413,7 @@ message LayerParameter {
   optional HeatmapDataParameter heatmap_data_param = 147;
   optional BNParameter bn_param = 45;
   optional UpsampleParameter upsample_param = 148;
+  optional EuclideanHeatmapParameter euclidean_heatmap_parameter = 149;
 }
 
 // Message that stores parameters used to apply transformation
@@ -802,6 +803,10 @@ message UpsampleParameter {
   optional bool pad_out_w = 5 [default = false];
   optional uint32 upsample_h = 6;
   optional uint32 upsample_w = 7;
+}
+
+message EuclideanHeatmapParameter {
+optional is_test = 1 [default = false];
 }
 
 message BNParameter {
