@@ -5,22 +5,14 @@ layer {
   top: "data"
   top: "heatmap_gt"
   top: "type"
-  visualise: false   
+  is_test: false
   heatmap_data_param {
     source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/training.txt"
     root_img_dir: "/data01/vision_rd/zhangfengyang/roomnet/LSUN/images/"
     batchsize: 10
-    cropsize: 320
     outsize: 320
-    sample_per_cluster: false
-    random_crop: true
     label_width: 40
     label_height: 40
-    segmentation: false
-    flip_joint_labels: false
-    dont_flip_first: true
-    angle_max: 40
-    multfact: 1  # set to 282 if using preprocessed data from website
   }
 }
 layer {
@@ -1379,6 +1371,7 @@ layer {
   bottom: "type"
   top: "keypoint_loss"
   loss_weight: 0.2
+  is_test: false
 }
 layer {
   name: "type_loss"

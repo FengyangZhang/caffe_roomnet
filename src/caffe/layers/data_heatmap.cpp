@@ -57,29 +57,27 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
     std::ifstream infile(gt_path.c_str());
     string img_name, typeStr, labels;
-    if (!sample_per_cluster_)
+    
+	// sequential sampling
+    while (infile >> img_name >> typeStr >> labels)
     {
-        // sequential sampling
-        while (infile >> img_name >> typeStr >> labels)
+        // read comma-separated list of regression labels
+        std::vector <float> label;
+        std::istringstream ss(labels);
+        int labelCounter = 1;
+        while (ss)
         {
-            // read comma-separated list of regression labels
-            std::vector <float> label;
-            std::istringstream ss(labels);
-            int labelCounter = 1;
-            while (ss)
-            {
-                std::string s;
-                if (!std::getline(ss, s, ',')) break;
-                label.push_back(atof(s.c_str()));
-                labelCounter++;
-            }
-            int type = atoi(typeStr.c_str());
-            img_label_list_.push_back(std::make_pair(img_name, std::make_pair(label, type)));
+            std::string s;
+            if (!std::getline(ss, s, ',')) break;
+            label.push_back(atof(s.c_str()));
+            labelCounter++;
         }
-
-        // initialise image counter to 0
-        cur_img_ = 0;
+        int type = atoi(typeStr.c_str());
+        img_label_list_.push_back(std::make_pair(img_name, std::make_pair(label, type)));
     }
+
+    // initialise image counter to 0
+    cur_img_ = 0;
 
     // assume input images are RGB (3 channels)
     this->datum_channels_ = 3;

@@ -95,7 +95,15 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
                     int image_idx = idx_img * label_img_size + idx_ch * label_channel_size + i * label_width + j;
                     // euclidean loss per pixel
                     float diff = (float)bottom_pred[image_idx] - (float)gt_pred[image_idx];
-                    loss += diff * diff;
+					
+					// degrade the background gradients
+					if(gt_pred[image_idx] == 0) {
+						loss += 0.2 * diff * diff;
+					}
+					else {
+                    	loss += diff * diff;
+					}
+
                     diff_.mutable_cpu_data()[image_idx] = diff;
 					
                     // Store visualisation for given channel
