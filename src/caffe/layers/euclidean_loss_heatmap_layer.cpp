@@ -48,8 +48,7 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
 
     int visualise_channel = this->layer_param_.visualise_channel();
     bool visualise = this->layer_param_.visualise();
-    bool is_test = this->layer_param_.euclidean_heatmap_parameter().is_test();
-
+	bool is_test = true;
     const Dtype* bottom_pred = bottom[0]->cpu_data(); // predictions for all images
     const Dtype* gt_pred = bottom[1]->cpu_data();    // GT predictions
     const Dtype* type_gt = bottom[2]->cpu_data();  // gt type
@@ -67,13 +66,14 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
 
     const int label_channel_size = label_height * label_width;
     const int label_img_size = label_channel_size * num_channels;
-    cv::Mat bottom_img, gt_img, diff_img;  // Initialise opencv images for visualisation
+    cv::Mat bottom_img, gt_img, bottom_img_8bit, gt_img_8bit;  // Initialise opencv images for visualisation
 
     if (is_test)
     {
         bottom_img = cv::Mat::zeros(label_height, label_width, CV_32FC1);
         gt_img = cv::Mat::zeros(label_height, label_width, CV_32FC1);
-        diff_img = cv::Mat::zeros(label_height, label_width, CV_32FC1);
+		bottom_img_8bit = cv::Mat::zeros(label_height, label_width, CV_8UC1);
+		gt_img_8bit = cv::Mat::zeros(label_height, label_width, CV_8UC1);
     }
 
     // Loop over images
@@ -100,17 +100,21 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
 					
                     // Store visualisation for given channel
                     if(is_test) {
-                        bottom_img.at<float>((int)j, (int)i) = (float) bottom_pred[image_idx];
-                        gt_img.at<float>((int)j, (int)i) = (float) gt_pred[image_idx];
-                        diff_img.at<float>((int)j, (int)i) = (float) diff * diff;
+						// DLOG(INFO) << (int)(255 * gt_pred[image_idx]);
+                        bottom_img.at<float>((int)j, (int)i) = (float)(255 * bottom_pred[image_idx]);
+                        gt_img.at<float>((int)j, (int)i) = (float)(255 * gt_pred[image_idx]);
                     }
                 }
             }
-            std::stringstream ss;
-            ss << type_gt[idx_img] << "-" << idx_ch;
-            string str = ss.str();
-            cv::imwrite("test/" + str + ".jpg", bottom_img);
-            cv::imwrite("test/" + str + "gt.jpg", gt_img);
+			if(is_test) {
+            	std::stringstream ss;
+            	ss << type_gt[idx_img] << "-" << idx_ch;
+            	string str = ss.str();
+			    bottom_img.convertTo(bottom_img_8bit, CV_8UC1);
+			    gt_img.convertTo(gt_img_8bit, CV_8UC1);
+            	cv::imwrite("test/" + str + ".png", bottom_img_8bit);
+            	cv::imwrite("test/" + str + "gt.png", gt_img_8bit);
+			}
         }
     }
 

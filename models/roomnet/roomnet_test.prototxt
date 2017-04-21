@@ -1397,9 +1397,6 @@ layer {
   bottom: "heatmap_gt"
   bottom: "type"
   top: "keypoint_loss"
-  euclidean_heatmap_parameter {
-    is_test: true
-  }
 }
 layer {
   name: "prob"
