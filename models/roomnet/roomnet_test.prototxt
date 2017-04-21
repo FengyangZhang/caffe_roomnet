@@ -10,15 +10,10 @@ layer {
     source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/training_zero.txt"
     root_img_dir: "/data01/vision_rd/zhangfengyang/roomnet/LSUN/images/"
     batchsize: 1
-    cropsize: 320
     outsize: 320
-    random_crop: true
     label_width: 40
     label_height: 40
-    segmentation: false
-    flip_joint_labels: false
-    dont_flip_first: true
-    multfact: 1  # set to 282 if using preprocessed data from website
+    is_test: true
   }
 }
 layer {

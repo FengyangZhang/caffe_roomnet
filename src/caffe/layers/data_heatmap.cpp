@@ -41,30 +41,15 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     HeatmapDataParameter heatmap_data_param = this->layer_param_.heatmap_data_param();
 
     // Shortcuts
-    const std::string labelindsStr = heatmap_data_param.labelinds();
     const int batchsize = heatmap_data_param.batchsize();
     const int label_width = heatmap_data_param.label_width();
     const int label_height = heatmap_data_param.label_height();
-    const int size = heatmap_data_param.cropsize();
     const int outsize = heatmap_data_param.outsize();
-    sample_per_cluster_ = heatmap_data_param.sample_per_cluster();
     root_img_dir_ = heatmap_data_param.root_img_dir();
-
 
     // initialise rng seed
     const unsigned int rng_seed = caffe_rng_rand();
     srand(rng_seed);
-
-    // get label inds to be used for training
-    std::istringstream labelss(labelindsStr);
-    LOG(INFO) << "using joint inds:";
-    while (labelss)
-    {
-        std::string s;
-        if (!std::getline(labelss, s, ',')) break;
-        labelinds_.push_back(atof(s.c_str()));
-        LOG(INFO) << atof(s.c_str());
-    }
 
     // load GT
     std::string gt_path = heatmap_data_param.source();
@@ -85,10 +70,7 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
             {
                 std::string s;
                 if (!std::getline(ss, s, ',')) break;
-                if (labelinds_.empty() || std::find(labelinds_.begin(), labelinds_.end(), labelCounter) != labelinds_.end())
-                {
-                    label.push_back(atof(s.c_str()));
-                }
+                label.push_back(atof(s.c_str()));
                 labelCounter++;
             }
             int type = atoi(typeStr.c_str());
@@ -98,136 +80,9 @@ void DataHeatmapLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
         // initialise image counter to 0
         cur_img_ = 0;
     }
-    // else
-    // {
-    //     uniform sampling w.r.t. classes
-    //     while (infile >> img_name >> labels >> cropInfos >> clusterClassStr)
-    //     {
-    //         int clusterClass = atoi(clusterClassStr.c_str());
 
-    //         if (clusterClass + 1 > img_list_.size())
-    //         {
-    //             // expand the array
-    //             img_list_.resize(clusterClass + 1);
-    //         }
-
-    //         // read comma-separated list of regression labels
-    //         std::vector <float> label;
-    //         std::istringstream ss(labels);
-    //         int labelCounter = 1;
-    //         while (ss)
-    //         {
-    //             std::string s;
-    //             if (!std::getline(ss, s, ',')) break;
-    //             if (labelinds_.empty() || std::find(labelinds_.begin(), labelinds_.end(), labelCounter) != labelinds_.end())
-    //             {
-    //                 label.push_back(atof(s.c_str()));
-    //             }
-    //             labelCounter++;
-    //         }
-
-    //         // read cropping info
-    //         std::vector <float> cropInfo;
-    //         std::istringstream ss2(cropInfos);
-    //         while (ss2)
-    //         {
-    //             std::string s;
-    //             if (!std::getline(ss2, s, ',')) break;
-    //             cropInfo.push_back(atof(s.c_str()));
-    //         }
-
-    //         img_list_[clusterClass].push_back(std::make_pair(img_name, std::make_pair(label, std::make_pair(cropInfo, clusterClass))));
-    //     }
-
-    //     const int num_classes = img_list_.size();
-
-    //     // init image sampling
-    //     cur_class_ = 0;
-    //     cur_class_img_.resize(num_classes);
-
-    //     // init image indices for each class
-    //     for (int idx_class = 0; idx_class < num_classes; idx_class++)
-    //     {
-    //         if (sample_per_cluster_)
-    //         {
-    //             cur_class_img_[idx_class] = rand() % img_list_[idx_class].size();
-    //             LOG(INFO) << idx_class << " size: " << img_list_[idx_class].size();
-    //         }
-    //         else
-    //         {
-    //             cur_class_img_[idx_class] = 0;
-    //         }
-    //     }
-    // }
-
-    if (!heatmap_data_param.has_meanfile())
-    {
-        // if no mean, assume input images are RGB (3 channels)
-        this->datum_channels_ = 3;
-        sub_mean_ = false;
-    } else {
-        // Implementation of per-video mean removal
-
-        sub_mean_ = true;
-        string mean_path = heatmap_data_param.meanfile();
-
-        LOG(INFO) << "Loading mean file from " << mean_path;
-        BlobProto blob_proto, blob_proto2;
-        Blob<Dtype> data_mean;
-        ReadProtoFromBinaryFile(mean_path.c_str(), &blob_proto);
-        data_mean.FromProto(blob_proto);
-        LOG(INFO) << "mean file loaded";
-
-        // read config
-        this->datum_channels_ = data_mean.channels();
-        num_means_ = data_mean.num();
-        LOG(INFO) << "num_means: " << num_means_;
-
-        // copy the per-video mean images to an array of OpenCV structures
-        const Dtype* mean_buf = data_mean.cpu_data();
-
-        // extract means from beginning of proto file
-        const int mean_height = data_mean.height();
-        const int mean_width = data_mean.width();
-        int mean_heights[num_means_];
-        int mean_widths[num_means_];
-
-        // offset in memory to mean images
-        const int meanOffset = 2 * (num_means_);
-        for (int n = 0; n < num_means_; n++)
-        {
-            mean_heights[n] = mean_buf[2 * n];
-            mean_widths[n] = mean_buf[2 * n + 1];
-        }
-
-        // save means as OpenCV-compatible files
-        for (int n = 0; n < num_means_; n++)
-        {
-            cv::Mat mean_img_tmp_;
-            mean_img_tmp_.create(mean_heights[n], mean_widths[n], CV_32FC3);
-            mean_img_.push_back(mean_img_tmp_);
-            LOG(INFO) << "per-video mean file array created: " << n << ": " << mean_heights[n] << "x" << mean_widths[n] << " (" << size << ")";
-        }
-
-        LOG(INFO) << "mean: " << mean_height << "x" << mean_width << " (" << size << ")";
-
-        for (int n = 0; n < num_means_; n++)
-        {
-            for (int i = 0; i < mean_heights[n]; i++)
-            {
-                for (int j = 0; j < mean_widths[n]; j++)
-                {
-                    for (int c = 0; c < this->datum_channels_; c++)
-                    {
-                        mean_img_[n].at<cv::Vec3f>(i, j)[c] = mean_buf[meanOffset + ((n * this->datum_channels_ + c) * mean_height + i) * mean_width + j]; //[c * mean_height * mean_width + i * mean_width + j];
-                    }
-                }
-            }
-        }
-
-        LOG(INFO) << "mean file converted to OpenCV structures";
-    }
-
+    // assume input images are RGB (3 channels)
+    this->datum_channels_ = 3;
 
     // init data
     // this->transformed_data_.Reshape(batchsize, this->datum_channels_, outsize, outsize);
@@ -275,39 +130,15 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     cv::Mat img, img_res, img_annotation_vis, img_mean_vis, img_vis, img_res_vis, mean_img_this, seg, segTmp;
 
     // Shortcuts to params
-    const bool visualise = this->layer_param_.visualise();
-    const Dtype scale = heatmap_data_param.scale();
+    const bool is_test = this->layer_param_.is_test();
     const int batchsize = heatmap_data_param.batchsize();
     const int label_height = heatmap_data_param.label_height();
     const int label_width = heatmap_data_param.label_width();
-    const float angle_max = heatmap_data_param.angle_max();
-    const bool dont_flip_first = heatmap_data_param.dont_flip_first();
-    const bool flip_joint_labels = heatmap_data_param.flip_joint_labels();
-    const int multfact = heatmap_data_param.multfact();
-    const bool segmentation = heatmap_data_param.segmentation();
-    const int size = heatmap_data_param.cropsize();
     const int outsize = heatmap_data_param.outsize();
     const int num_aug = 1;
-    const bool random_crop = heatmap_data_param.random_crop();
 
     // Shortcuts to global vars
-    const bool sub_mean = this->sub_mean_;
     const int channels = this->datum_channels_;
-
-    // What coordinates should we flip when mirroring images?
-    // For pose estimation with joints assumes i=0,1 are for head, and i=2,3 left wrist, i=4,5 right wrist etc
-    //     in which case dont_flip_first should be set to true.
-    int flip_start_ind;
-    if (dont_flip_first) flip_start_ind = 2;
-    else flip_start_ind = 0;
-
-    if (visualise)
-    {
-        cv::namedWindow("original image", cv::WINDOW_AUTOSIZE);
-        cv::namedWindow("cropped image", cv::WINDOW_AUTOSIZE);
-        cv::namedWindow("interim resize image", cv::WINDOW_AUTOSIZE);
-        cv::namedWindow("resulting image", cv::WINDOW_AUTOSIZE);
-    }
 
     // collect "batchsize" images
     std::vector<float> cur_label;
@@ -328,32 +159,6 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         DLOG(INFO) << "img: " << img_path;
         img = cv::imread(img_path, CV_LOAD_IMAGE_COLOR);
 
-        // show image
-        if (visualise)
-        {
-            img_annotation_vis = img.clone();
-            this->VisualiseAnnotations(img_annotation_vis, label_num_channels, cur_label, multfact);
-            cv::imshow("original image", img_annotation_vis);
-        }
-
-        // use if seg exists
-        if (segmentation)
-        {
-            std::string seg_path = this->root_img_dir_ + "segs/" + img_name;
-            std::ifstream ifile(seg_path.c_str());
-
-            // Skip this file if segmentation doesn't exist
-            if (!ifile.good())
-            {
-                LOG(INFO) << "file " << seg_path << " does not exist!";
-                idx_img--;
-                this->AdvanceCurImg();
-                continue;
-            }
-            ifile.close();
-            seg = cv::imread(seg_path, CV_LOAD_IMAGE_GRAYSCALE);
-        }
-
         int width = img.cols;
         int height = img.rows;
         int x_border = width - size;
@@ -365,48 +170,6 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         // to float
         img.convertTo(img, CV_32FC3);
 
-        if (segmentation)
-        {
-            segTmp = cv::Mat::zeros(img.rows, img.cols, CV_32FC3);
-            int threshold = 40;
-            seg = (seg > threshold);
-            segTmp.copyTo(img, seg);
-        }
-
-        // subtract per-video mean if used
-        // int meanInd = 0;
-        // if (sub_mean)
-        // {
-        //     std::string delimiter = "/";
-        //     std::string img_name_subdirImg = img_name.substr(img_name.find(delimiter) + 1, img_name.length());
-        //     std::string meanIndStr = img_name_subdirImg.substr(0, img_name_subdirImg.find(delimiter));
-        //     meanInd = atoi(meanIndStr.c_str()) - 1;
-
-        //     // subtract the cropped mean
-        //     mean_img_this = this->mean_img_[meanInd].clone();
-
-        //     DLOG(INFO) << "Image size: " << width << "x" << height;
-
-        //     // crop and resize mean image
-        //     mean_img_this = mean_img_this(crop);
-        //     cv::resize(mean_img_this, mean_img_this, img.size());
-
-        //     DLOG(INFO) << "Cropped mean image.";
-
-        //     img -= mean_img_this;
-
-        //     DLOG(INFO) << "Subtracted mean image.";
-
-        //     if (visualise)
-        //     {
-        //         img_vis -= mean_img_this;
-        //         img_mean_vis = mean_img_this.clone() / 255;
-        //         cv::cvtColor(img_mean_vis, img_mean_vis, CV_RGB2BGR);
-        //         cv::imshow("mean image", img_mean_vis);
-        //     }
-        // }
-
-        // pad images that aren't wide enough
         if (x_border < 0)
         {
             DLOG(INFO) << "padding " << img_path << " -- not wide enough.";
@@ -457,139 +220,8 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
                 // "flip" annotation coordinates
                 for (int i = 0; i < label_num_valid_channels; i += 2)
-                    cur_label_aug[i] = (float)width / (float)multfact - cur_label_aug[i];
+                    cur_label_aug[i] = (float)width - cur_label_aug[i];
             }
-
-            // FengyangZhang: don't do random crop
-            // if (random_crop)
-            // {
-            //     // random sampling
-            //     DLOG(INFO) << "random crop sampling";
-
-            //     // horizontal flip
-            //     if (rand() % 2)
-            //     {
-            //         // flip
-            //         cv::flip(img, img, 1);
-
-            //         if (visualise)
-            //             cv::flip(img_vis, img_vis, 1);
-
-            //         // "flip" annotation coordinates
-            //         for (int i = 0; i < label_num_channels; i += 2)
-            //             cur_label_aug[i] = (float)width / (float)multfact - cur_label_aug[i];
-
-            //         // "flip" annotation joint numbers
-            //         // assumes i=0,1 are for head, and i=2,3 left wrist, i=4,5 right wrist etc
-            //         // where coordinates are (x,y)
-            //         if (flip_joint_labels)
-            //         {
-            //             float tmp_x, tmp_y;
-            //             for (int i = flip_start_ind; i < label_num_channels; i += 4)
-            //             {
-            //                 CHECK_LT(i + 3, label_num_channels);
-            //                 tmp_x = cur_label_aug[i];
-            //                 tmp_y = cur_label_aug[i + 1];
-            //                 cur_label_aug[i] = cur_label_aug[i + 2];
-            //                 cur_label_aug[i + 1] = cur_label_aug[i + 3];
-            //                 cur_label_aug[i + 2] = tmp_x;
-            //                 cur_label_aug[i + 3] = tmp_y;
-            //             }
-            //         }
-            //     }
-
-            //     // left-top coordinates of the crop [0;x_border] x [0;y_border]
-            //     int x0 = 0, y0 = 0;
-            //     x0 = rand() % (x_border + 1);
-            //     y0 = rand() % (y_border + 1);
-
-            //     // do crop
-            //     cv::Rect crop(x0, y0, size, size);
-
-            //     // NOTE: no full copy performed, so the original image buffer is affected by the transformations below
-            //     cv::Mat img_crop(img, crop);
-
-            //     // "crop" annotations
-            //     for (int i = 0; i < label_num_channels; i += 2)
-            //     {
-            //         cur_label_aug[i] -= (float)x0 / (float) multfact;
-            //         cur_label_aug[i + 1] -= (float)y0 / (float) multfact;
-            //     }
-
-            //     // show image
-            //     if (visualise)
-            //     {
-            //         DLOG(INFO) << "cropped image";
-            //         cv::Mat img_vis_crop(img_vis, crop);
-            //         cv::Mat img_res_vis = img_vis_crop / 255;
-            //         cv::cvtColor(img_res_vis, img_res_vis, CV_RGB2BGR);
-            //         this->VisualiseAnnotations(img_res_vis, label_num_channels, cur_label_aug, multfact);
-            //         cv::imshow("cropped image", img_res_vis);
-            //     }
-
-            //     // rotations
-            //     float angle = Uniform(-angle_max, angle_max);
-            //     cv::Mat M = this->RotateImage(img_crop, angle);
-
-            //     // also flip & rotate labels
-            //     for (int i = 0; i < label_num_channels; i += 2)
-            //     {
-            //         // convert to image space
-            //         float x = cur_label_aug[i] * (float) multfact;
-            //         float y = cur_label_aug[i + 1] * (float) multfact;
-
-            //         // rotate
-            //         cur_label_aug[i] = M.at<double>(0, 0) * x + M.at<double>(0, 1) * y + M.at<double>(0, 2);
-            //         cur_label_aug[i + 1] = M.at<double>(1, 0) * x + M.at<double>(1, 1) * y + M.at<double>(1, 2);
-
-            //         // convert back to joint space
-            //         cur_label_aug[i] /= (float) multfact;
-            //         cur_label_aug[i + 1] /= (float) multfact;
-            //     }
-
-            //     img_res = img_crop;
-            // } else {
-            //     // determinsitic sampling
-            //     DLOG(INFO) << "deterministic crop sampling (centre)";
-
-            //     // centre crop
-            //     const int y0 = y_border / 2;
-            //     const int x0 = x_border / 2;
-
-            //     DLOG(INFO) << "cropping image from " << x0 << "x" << y0;
-
-            //     // do crop
-            //     cv::Rect crop(x0, y0, size, size);
-            //     cv::Mat img_crop(img, crop);
-
-            //     DLOG(INFO) << "cropping annotations.";
-
-            //     // "crop" annotations
-            //     for (int i = 0; i < label_num_channels; i += 2)
-            //     {
-            //         cur_label_aug[i] -= (float)x0 / (float) multfact;
-            //         cur_label_aug[i + 1] -= (float)y0 / (float) multfact;
-            //     }
-
-            //     if (visualise)
-            //     {
-            //         cv::Mat img_vis_crop(img_vis, crop);
-            //         cv::Mat img_res_vis = img_vis_crop.clone() / 255;
-            //         cv::cvtColor(img_res_vis, img_res_vis, CV_RGB2BGR);
-            //         this->VisualiseAnnotations(img_res_vis, label_num_channels, cur_label_aug, multfact);
-            //         cv::imshow("cropped image", img_res_vis);
-            //     }
-            //     img_res = img_crop;
-            // }
-
-            // // show image
-            // if (visualise)
-            // {
-            //     cv::Mat img_res_vis = img_res / 255;
-            //     cv::cvtColor(img_res_vis, img_res_vis, CV_RGB2BGR);
-            //     this->VisualiseAnnotations(img_res_vis, label_num_channels, cur_label_aug, multfact);
-            //     cv::imshow("interim resize image", img_res_vis);
-            // }
 
             DLOG(INFO) << "Resizing output image.";
 
@@ -599,7 +231,11 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
             cv::Size s(outsize, outsize);
             cv::resize(img, img_res, s);
-    
+
+            if(is_test) {
+                cv::imwrite("test/resized.png", img_res);                
+            }
+
             // "resize" annotations
             for (int i = 0; i < label_num_valid_channels; i+=2)
                 cur_label_aug[i] *= resizeFact_x;
@@ -641,8 +277,10 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             // set ground truth label on corresponding channels
             for (int idx_ch = low_indice; idx_ch < high_indice; idx_ch++)
             {
-                float x = label_resize_fact * cur_label_aug[2*(idx_ch-low_indice)] * multfact;
-                float y = label_resize_fact * cur_label_aug[2*(idx_ch-low_indice)+1] * multfact;
+                float x = label_resize_fact * cur_label_aug[2*(idx_ch-low_indice)];
+                float y = label_resize_fact * cur_label_aug[2*(idx_ch-low_indice)+1];
+                DLOG(INFO) << x << y;
+                
                 for (int i = 0; i < label_height; i++)
                 {
                     for (int j = 0; j < label_width; j++)
@@ -702,49 +340,19 @@ template<typename Dtype>
 void DataHeatmapLayer<Dtype>::GetCurImg(string& img_name, std::vector<float>& img_label, int& img_type)
 {
 
-    if (!sample_per_cluster_)
-    {
-        img_name = img_label_list_[cur_img_].first;
-        img_label = img_label_list_[cur_img_].second.first;
-        img_type = img_label_list_[cur_img_].second.second;
-    }
-    // else
-    // {
-        // img_class = cur_class_;
-        // img_name = img_list_[img_class][cur_class_img_[img_class]].first;
-        // img_label = img_list_[img_class][cur_class_img_[img_class]].second.first;
-        // crop_info = img_list_[img_class][cur_class_img_[img_class]].second.second.first;
-    // }
+    img_name = img_label_list_[cur_img_].first;
+    img_label = img_label_list_[cur_img_].second.first;
+    img_type = img_label_list_[cur_img_].second.second;
 }
 
 template<typename Dtype>
 void DataHeatmapLayer<Dtype>::AdvanceCurImg()
 {
-    if (!sample_per_cluster_)
-    {
-        if (cur_img_ < img_label_list_.size() - 1)
-            cur_img_++;
-        else
-            cur_img_ = 0;
-    }
+    if (cur_img_ < img_label_list_.size() - 1)
+        cur_img_++;
     else
-    {
-        // const int num_classes = img_list_.size();
-
-        // if (cur_class_img_[cur_class_] < img_list_[cur_class_].size() - 1)
-        //     cur_class_img_[cur_class_]++;
-        // else
-        //     cur_class_img_[cur_class_] = 0;
-
-        // // move to the next class
-        // if (cur_class_ < num_classes - 1)
-        //     cur_class_++;
-        // else
-        //     cur_class_ = 0;
-    }
-
+        cur_img_ = 0;
 }
-
 
 template<typename Dtype>
 void DataHeatmapLayer<Dtype>::VisualiseAnnotations(cv::Mat img_annotation_vis, int label_num_channels, std::vector<float>& img_class, int multfact)
