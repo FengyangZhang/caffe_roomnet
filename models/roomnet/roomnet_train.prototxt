@@ -1382,5 +1382,19 @@ layer {
   softmax_param {
     engine: CAFFE
   }
+  loss_param: {
+    weight_by_label_freqs: true
+    class_weighting: 0.5739
+    class_weighting: 2.4096
+    class_weighting: 200
+    class_weighting: 14.815
+    class_weighting: 0.3992
+    class_weighting: 0.2212
+    class_weighting: 5.1948
+    class_weighting: 80
+    class_weighting: 100
+    class_weighting: 1.8868
+    class_weighting: 8.6956
+  }
   loss_weight: 0.8
 }
