@@ -6,14 +6,14 @@ layer {
   top: "heatmap_gt"
   top: "type"
   visualise: false
+  is_test: true
   heatmap_data_param {
-    source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/training_zero.txt"
+    source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/train_single.txt"
     root_img_dir: "/data01/vision_rd/zhangfengyang/roomnet/LSUN/images/"
     batchsize: 1
     outsize: 320
     label_width: 40
     label_height: 40
-    is_test: true
   }
 }
 layer {

@@ -161,8 +161,8 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
         int width = img.cols;
         int height = img.rows;
-        int x_border = width - size;
-        int y_border = height - size;
+        int x_border = width - outsize;
+        int y_border = height - outsize;
 
         // convert from BGR to RGB
         cv::cvtColor(img, img, CV_BGR2RGB);
@@ -176,7 +176,7 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
             cv::copyMakeBorder(img, img, 0, 0, 0, -x_border, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
             width = img.cols;
-            x_border = width - size;
+            x_border = width - outsize;
 
             // FengyangZhang: ??? don't know why add offset here
             // add border offset to joints
@@ -192,7 +192,7 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
             cv::copyMakeBorder(img, img, 0, -y_border, 0, 0, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
             height = img.rows;
-            y_border = height - size;
+            y_border = height - outsize;
 
 
             DLOG(INFO) << "new height: " << height << "   y_border: " << y_border;
@@ -228,6 +228,8 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             // resize to output image size
             float resizeFact_x = (float)outsize / (float)img.cols;
             float resizeFact_y = (float)outsize / (float)img.rows;
+			DLOG(INFO) << "resizeFact_x: " << resizeFact_x;	
+			DLOG(INFO) << "resizeFact_y: " << resizeFact_y;	
 
             cv::Size s(outsize, outsize);
             cv::resize(img, img_res, s);
@@ -242,10 +244,6 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
             for (int i = 1; i < label_num_valid_channels; i+=2)
                 cur_label_aug[i] *= resizeFact_y;
-
-            // multiply by scale
-            if (scale != 1.0)
-                img_res *= scale;
 
             // resulting image dims
             const int channel_size = outsize * outsize;
@@ -279,13 +277,13 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             {
                 float x = label_resize_fact * cur_label_aug[2*(idx_ch-low_indice)];
                 float y = label_resize_fact * cur_label_aug[2*(idx_ch-low_indice)+1];
-                DLOG(INFO) << x << y;
+                DLOG(INFO) << x << ", " << y;
                 
                 for (int i = 0; i < label_height; i++)
                 {
                     for (int j = 0; j < label_width; j++)
                     {
-                        int label_idx = idx_img_aug * label_img_size + idx_ch * label_channel_size + i * label_height + j;
+                        int label_idx = idx_img_aug * label_img_size + idx_ch * label_channel_size + i * label_width + j;
                         float gaussian = ( 1 / ( sigma * sqrt(2 * M_PI) ) ) * exp( -0.5 * ( pow(i - y, 2.0) + pow(j - x, 2.0) ) * pow(1 / sigma, 2.0) );
                         gaussian = 4 * gaussian;
                         top_label[label_idx] = gaussian;
@@ -323,10 +321,6 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
         // move to the next image
         this->AdvanceCurImg();
-
-        if (visualise)
-            cv::waitKey(0);
-
 
     } // original image loop
 
