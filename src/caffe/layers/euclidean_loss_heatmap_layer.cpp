@@ -48,7 +48,7 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
 
     int visualise_channel = this->layer_param_.visualise_channel();
     bool visualise = this->layer_param_.visualise();
-	bool is_test = true;
+	bool is_test = this->layer_param_.is_test();
     const Dtype* bottom_pred = bottom[0]->cpu_data(); // predictions for all images
     const Dtype* gt_pred = bottom[1]->cpu_data();    // GT predictions
     const Dtype* type_gt = bottom[2]->cpu_data();  // gt type
