@@ -76,6 +76,21 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
 		gt_img_8bit = cv::Mat::zeros(label_height, label_width, CV_8UC1);
     }
 
+    for (int idx_img = 0; idx_img < num_images; idx_img++)
+    {
+        for (int idx_ch = 0; idx_ch < 48; idx_ch++)
+        {
+            for (int i = 0; i < label_height; i++)
+            {
+                for (int j = 0; j < label_width; j++)
+                {
+                    int image_idx = idx_img * label_img_size + idx_ch * label_channel_size + i * label_width + j;
+                    diff_.mutable_cpu_data()[image_idx] = 0;
+                }
+            }
+        }
+    }
+
     // Loop over images
     for (int idx_img = 0; idx_img < num_images; idx_img++)
     {
@@ -98,7 +113,7 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
 					
 					// degrade the background gradients
 					if(gt_pred[image_idx] == 0) {
-						loss += 0.04 * diff * diff;
+						loss += 0.1 * diff * diff;
 					}
 					else {
                     	loss += diff * diff;
@@ -296,19 +311,26 @@ template <typename Dtype>
 void EuclideanLossHeatmapLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom)
 {
-    for (int i = 0; i < 2; ++i) {
-    if (propagate_down[i]) {
-      const Dtype sign = (i == 0) ? 1 : -1;
-      const Dtype alpha = sign * top[0]->cpu_diff()[0] / bottom[i]->num();
-      caffe_cpu_axpby(
-          bottom[i]->count(),              // count
-          alpha,                              // alpha
-          diff_.cpu_data(),                   // a
-          Dtype(0),                           // beta
-          bottom[i]->mutable_cpu_diff());  // b
-    }
-  }
-
+    // for (int i = 0; i < 2; ++i) {
+    // if (propagate_down[i]) {
+    //   const Dtype sign = (i == 0) ? 1 : -1;
+    //   const Dtype alpha = sign * top[0]->cpu_diff()[0] / bottom[i]->num();
+    //   caffe_cpu_axpby(
+    //       bottom[i]->count(),              // count
+    //       alpha,                              // alpha
+    //       diff_.cpu_data(),                   // a
+    //       Dtype(0),                           // beta
+    //       bottom[i]->mutable_cpu_diff());  // b
+    // }
+    // }
+    const Dtype alpha = top[0]->cpu_diff()[0] / bottom[0]->num();
+    caffe_cpu_axpby(
+        bottom[0]->count(),
+        alpha,
+        diff_.cpu_data(),
+        Dtype(0),
+        bottom[0]->mutable_cpu_diff()
+    );
 }
 
 
