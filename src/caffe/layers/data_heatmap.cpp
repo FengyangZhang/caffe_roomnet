@@ -275,7 +275,7 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             {
                 float x = label_resize_fact * cur_label_aug[2*(idx_ch-low_indice)];
                 float y = label_resize_fact * cur_label_aug[2*(idx_ch-low_indice)+1];
-                DLOG(INFO) << x << ", " << y;
+                // DLOG(INFO) << x << ", " << y;
                 
                 for (int i = 0; i < label_height; i++)
                 {

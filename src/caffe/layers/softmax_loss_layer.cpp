@@ -53,6 +53,8 @@ void SoftmaxWithLossLayer<Dtype>::Reshape(
       bottom[0]->CanonicalAxisIndex(this->layer_param_.softmax_param().axis());
   outer_num_ = bottom[0]->count(0, softmax_axis_);
   inner_num_ = bottom[0]->count(softmax_axis_ + 1);
+  DLOG(INFO) << "outer_num: " << outer_num_;
+  DLOG(INFO) << "inner_num: " << inner_num_;
   CHECK_EQ(outer_num_ * inner_num_, bottom[1]->count())
       << "Number of labels must match number of predictions; "
       << "e.g., if softmax axis == 1 and prediction shape is (N, C, H, W), "
@@ -81,6 +83,7 @@ void SoftmaxWithLossLayer<Dtype>::Forward_cpu(
   for (int i = 0; i < outer_num_; ++i) {
     for (int j = 0; j < inner_num_; j++) {
       const int label_value = static_cast<int>(label[i * inner_num_ + j]);
+      DLOG(INFO) << "label_value: " << label_value;
       if (has_ignore_label_ && label_value == ignore_label_) {
         continue;
       }
@@ -88,6 +91,10 @@ void SoftmaxWithLossLayer<Dtype>::Forward_cpu(
       DCHECK_LT(label_value, prob_.shape(softmax_axis_));
       const int idx = i * dim + label_value * inner_num_ + j;
       if (weight_by_label_freqs_) {
+        DLOG(INFO) << "probs: " << "0-" << prob_data[i*dim] << " 1-" << prob_data[i*dim+1] << " 2-" <<prob_data[i*dim+2]
+					 << " 3-" <<prob_data[i*dim+3] << " 4-" <<prob_data[i*dim+4] << " 5-" <<prob_data[i*dim+5] << " 6-" <<prob_data[i*dim+6]
+                       << " 7-" <<prob_data[i*dim+7] << " 8-" <<prob_data[i*dim+8] << " 9-" <<prob_data[i*dim+9] << " 10-" <<prob_data[i*dim+10];
+        DLOG(INFO) << "prob_data: " << prob_data[idx];
         const float* label_count_data = label_counts_.cpu_data();
         loss -= log(std::max(prob_data[idx], Dtype(FLT_MIN)))
             * static_cast<Dtype>(label_count_data[label_value]);

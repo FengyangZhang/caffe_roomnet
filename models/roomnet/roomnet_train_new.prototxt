@@ -44,25 +44,16 @@ layer {
   bottom: "conv1_1"
   top: "conv1_1"
   name: "conv1_1_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv1_1"
@@ -99,25 +90,16 @@ layer {
   bottom: "conv1_2"
   top: "conv1_2"
   name: "conv1_2_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv1_2"
@@ -165,25 +147,16 @@ layer {
   bottom: "conv2_1"
   top: "conv2_1"
   name: "conv2_1_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv2_1"
@@ -220,25 +193,16 @@ layer {
   bottom: "conv2_2"
   top: "conv2_2"
   name: "conv2_2_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv2_2"
@@ -286,25 +250,16 @@ layer {
   bottom: "conv3_1"
   top: "conv3_1"
   name: "conv3_1_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv3_1"
@@ -341,25 +296,16 @@ layer {
   bottom: "conv3_2"
   top: "conv3_2"
   name: "conv3_2_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv3_2"
@@ -396,25 +342,16 @@ layer {
   bottom: "conv3_3"
   top: "conv3_3"
   name: "conv3_3_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv3_3"
@@ -471,25 +408,16 @@ layer {
   bottom: "conv4_1"
   top: "conv4_1"
   name: "conv4_1_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv4_1"
@@ -526,25 +454,16 @@ layer {
   bottom: "conv4_2"
   top: "conv4_2"
   name: "conv4_2_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv4_2"
@@ -581,25 +500,16 @@ layer {
   bottom: "conv4_3"
   top: "conv4_3"
   name: "conv4_3_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv4_3"
@@ -657,25 +567,16 @@ layer {
   bottom: "conv5_1"
   top: "conv5_1"
   name: "conv5_1_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv5_1"
@@ -712,25 +613,16 @@ layer {
   bottom: "conv5_2"
   top: "conv5_2"
   name: "conv5_2_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv5_2"
@@ -767,25 +659,16 @@ layer {
   bottom: "conv5_3"
   top: "conv5_3"
   name: "conv5_3_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv5_3"
@@ -930,25 +813,16 @@ layer {
   bottom: "conv5_3_D"
   top: "conv5_3_D"
   name: "conv5_3_D_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv5_3_D"
@@ -986,25 +860,16 @@ layer {
   bottom: "conv5_2_D"
   top: "conv5_2_D"
   name: "conv5_2_D_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv5_2_D"
@@ -1041,25 +906,16 @@ layer {
   bottom: "conv5_1_D"
   top: "conv5_1_D"
   name: "conv5_1_D_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv5_1_D"
@@ -1117,25 +973,16 @@ layer {
   bottom: "conv4_3_D"
   top: "conv4_3_D"
   name: "conv4_3_D_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv4_3_D"
@@ -1172,25 +1019,16 @@ layer {
   bottom: "conv4_2_D"
   top: "conv4_2_D"
   name: "conv4_2_D_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv4_2_D"
@@ -1227,26 +1065,16 @@ layer {
   bottom: "conv4_1_D"
   top: "conv4_1_D"
   name: "conv4_1_D_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
-  }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
-}
+  param {
+    lr_mult: 0
+  }}
 layer {
   bottom: "conv4_1_D"
   top: "conv4_1_D"
@@ -1282,25 +1110,16 @@ layer {
   bottom: "conv_final_64_D"
   top: "conv_final_64_D"
   name: "conv4_final_64_D_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv_final_64_D"
@@ -1337,25 +1156,16 @@ layer {
   bottom: "conv_final_48_D"
   top: "conv_final_48_D"
   name: "conv4_final_48_D_bn"
-  type: "BN"
+  type: "BatchNorm"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 0
+    lr_mult: 0
   }
-  bn_param {
-  scale_filler {
-    type: "constant"
-    value: 1
+  param {
+    lr_mult: 0
   }
-  shift_filler {
-    type: "constant"
-    value: 0.001
-  }
- }
 }
 layer {
   bottom: "conv_final_48_D"
@@ -1370,7 +1180,7 @@ layer {
   bottom: "heatmap_gt"
   bottom: "type"
   top: "keypoint_loss"
-  loss_weight: 0
+  loss_weight: 0.2
   is_test: false
 }
 layer {
@@ -1381,6 +1191,20 @@ layer {
   top: "type_loss"
   softmax_param {
     engine: CAFFE
+  }
+  loss_param: {
+    weight_by_label_freqs: true
+    class_weighting: 0.5739
+    class_weighting: 2.4096
+    class_weighting: 200
+    class_weighting: 14.815
+    class_weighting: 0.3992
+    class_weighting: 0.2212
+    class_weighting: 5.1948
+    class_weighting: 80
+    class_weighting: 100
+    class_weighting: 1.8868
+    class_weighting: 8.6956
   }
   loss_weight: 0.8
 }

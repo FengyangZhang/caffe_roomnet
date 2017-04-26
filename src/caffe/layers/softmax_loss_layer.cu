@@ -66,6 +66,7 @@ void SoftmaxWithLossLayer<Dtype>::Forward_gpu(
   } else {
     loss /= outer_num_;
   }
+  DLOG(INFO) << "Softmax head loss: " << loss;
   top[0]->mutable_cpu_data()[0] = loss;
   if (top.size() == 2) {
     top[1]->ShareData(prob_);

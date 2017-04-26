@@ -98,7 +98,7 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
 					
 					// degrade the background gradients
 					if(gt_pred[image_idx] == 0) {
-						loss += 0.2 * diff * diff;
+						loss += 0.04 * diff * diff;
 					}
 					else {
                     	loss += diff * diff;
@@ -124,10 +124,54 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
             	cv::imwrite("test/" + str + "gt.png", gt_img_8bit);
 			}
         }
+        // if test, save other channel's heatmaps as well
+        if(is_test) {
+        	for (int idx_ch = 0; idx_ch < type_ind_range[type_int]; idx_ch++)
+        	{
+            	for (int i = 0; i < label_height; i++)
+            	{
+                	for (int j = 0; j < label_width; j++)
+                	{
+                    	int image_idx = idx_img * label_img_size + idx_ch * label_channel_size + i * label_width + j;
+                        bottom_img.at<float>((int)i, (int)j) = (float)(255 * bottom_pred[image_idx]);
+                        gt_img.at<float>((int)i, (int)j) = (float)(255 * gt_pred[image_idx]);
+                    }
+                }
+            	std::stringstream ss;
+            	ss << type_gt[idx_img] << "-" << idx_ch;
+            	string str = ss.str();
+			    bottom_img.convertTo(bottom_img_8bit, CV_8UC1);
+			    gt_img.convertTo(gt_img_8bit, CV_8UC1);
+            	cv::imwrite("test/" + str + ".png", bottom_img_8bit);
+            	cv::imwrite("test/" + str + "gt.png", gt_img_8bit);
+			}
+		}
+        if(is_test) {
+        	for (int idx_ch = type_ind_range[type_int+1]; idx_ch < 48; idx_ch++)
+        	{
+            	for (int i = 0; i < label_height; i++)
+            	{
+                	for (int j = 0; j < label_width; j++)
+                	{
+                    	int image_idx = idx_img * label_img_size + idx_ch * label_channel_size + i * label_width + j;
+                        bottom_img.at<float>((int)i, (int)j) = (float)(255 * bottom_pred[image_idx]);
+                        gt_img.at<float>((int)i, (int)j) = (float)(255 * gt_pred[image_idx]);
+                    }
+                }
+            	std::stringstream ss;
+            	ss << type_gt[idx_img] << "-" << idx_ch;
+            	string str = ss.str();
+			    bottom_img.convertTo(bottom_img_8bit, CV_8UC1);
+			    gt_img.convertTo(gt_img_8bit, CV_8UC1);
+            	cv::imwrite("test/" + str + ".png", bottom_img_8bit);
+            	cv::imwrite("test/" + str + "gt.png", gt_img_8bit);
+			}
+		}
     }
 
     DLOG(INFO) << "Euclidean head total loss: " << loss;
-    loss /= (num_images * num_channels * label_channel_size);
+    // loss /= (num_images * num_channels * label_channel_size);
+    loss /= (num_images * num_channels * 2);
     DLOG(INFO) << "Euclidean head total normalised loss: " << loss;
 
     top[0]->mutable_cpu_data()[0] = loss;
