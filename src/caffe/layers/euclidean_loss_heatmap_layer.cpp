@@ -112,12 +112,11 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
                     float diff = (float)bottom_pred[image_idx] - (float)gt_pred[image_idx];
 					
 					// degrade the background gradients
-					if(gt_pred[image_idx] == 0) {
-						loss += 0.1 * diff * diff;
+					if(gt_pred[image_idx] <= 10) {
+						diff *= 0.1;
 					}
-					else {
-                    	loss += diff * diff;
-					}
+                    	
+					loss += diff * diff;
 
                     diff_.mutable_cpu_data()[image_idx] = diff;
 					
@@ -186,7 +185,7 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
 
     DLOG(INFO) << "Euclidean head total loss: " << loss;
     // loss /= (num_images * num_channels * label_channel_size);
-    loss /= (num_images * num_channels * 2);
+    loss /= (num_images * num_channels);
     DLOG(INFO) << "Euclidean head total normalised loss: " << loss;
 
     top[0]->mutable_cpu_data()[0] = loss;
