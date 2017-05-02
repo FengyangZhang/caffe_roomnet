@@ -125,7 +125,7 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     Dtype* top_label = batch->label_.mutable_cpu_data();
     Dtype* top_type = batch->type_.mutable_cpu_data();
 
-    cv::Mat img, img_res, img_annotation_vis, img_mean_vis, img_vis, img_res_vis, mean_img_this, seg, segTmp;
+    cv::Mat img, img_res, img_annotation_vis, img_mean_vis, img_vis, img_res_vis, mean_img_this, seg, segTmp, img_flip;
 
     // Shortcuts to params
     const bool is_test = this->layer_param_.is_test();
@@ -209,7 +209,8 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             // store image type
             DLOG(INFO) << "storing type:" << cur_type;
             top_type[idx_img_aug] = cur_type;
-
+			
+			
             // FengyangZhang: do random horizontal flip
             if (rand() % 2)
             {
@@ -220,6 +221,9 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 for (int i = 0; i < label_num_valid_channels; i += 2)
                     cur_label_aug[i] = (float)width - cur_label_aug[i];
             }
+			else {
+				img = img;
+			}
 
             DLOG(INFO) << "Resizing output image.";
 

@@ -9,7 +9,7 @@ layer {
   heatmap_data_param {
     source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/training.txt"
     root_img_dir: "/data01/vision_rd/zhangfengyang/roomnet/LSUN/images/"
-    batchsize: 10
+    batchsize: 16
     outsize: 320
     label_width: 40
     label_height: 40
@@ -1370,7 +1370,7 @@ layer {
   bottom: "heatmap_gt"
   bottom: "type"
   top: "keypoint_loss"
-  loss_weight: 0
+  loss_weight: 1
   is_test: false
 }
 layer {
@@ -1382,5 +1382,5 @@ layer {
   softmax_param {
     engine: CAFFE
   }
-  loss_weight: 0.8
+  loss_weight: 0
 }

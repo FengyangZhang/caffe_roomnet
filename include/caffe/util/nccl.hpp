@@ -2,7 +2,7 @@
 #define CAFFE_UTIL_NCCL_H_
 #ifdef USE_NCCL
 
-#include <nccl.h>
+#include "/data01/vision_rd/common/include/nccl.h"
 
 #include "caffe/common.hpp"
 
