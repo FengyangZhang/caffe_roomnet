@@ -10,6 +10,6 @@ display: 20
 momentum: 0.9
 max_iter: 20000
 weight_decay: 0.0005
-snapshot: 1000
-snapshot_prefix: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/snapshots"
+snapshot: 2000
+snapshot_prefix: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/snapshots_std5"
 solver_mode: GPU
