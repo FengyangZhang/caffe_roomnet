@@ -134,6 +134,51 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     const int label_width = heatmap_data_param.label_width();
     const int outsize = heatmap_data_param.outsize();
     const int num_aug = 1;
+    const int type_ind_range[12] = {0, 8, 14, 20, 24, 28, 34, 38, 42, 44, 46, 48};
+    vector< vector< pair<int, int> > > swap_label_list;
+    
+	vector <pair<int, int> > swap_labels;
+    swap_labels.push_back(std::make_pair(0, 6));
+    swap_labels.push_back(std::make_pair(2, 4));
+    swap_labels.push_back(std::make_pair(1, 7));
+    swap_labels.push_back(std::make_pair(3, 5));
+	swap_label_list.push_back(swap_labels);
+	swap_labels.clear();
+    swap_labels.push_back(std::make_pair(0, 3));
+    swap_labels.push_back(std::make_pair(1, 4));
+    swap_labels.push_back(std::make_pair(2, 5));
+	swap_label_list.push_back(swap_labels);
+	swap_labels.clear();
+    swap_labels.push_back(std::make_pair(0, 3));
+    swap_labels.push_back(std::make_pair(1, 4));
+    swap_labels.push_back(std::make_pair(2, 5));
+	swap_label_list.push_back(swap_labels);
+	swap_labels.clear();
+    swap_labels.push_back(std::make_pair(1, 3));
+	swap_label_list.push_back(swap_labels);
+	swap_labels.clear();
+    swap_labels.push_back(std::make_pair(1, 3));
+	swap_label_list.push_back(swap_labels);
+	swap_labels.clear();
+    swap_labels.push_back(std::make_pair(1, 2));
+    swap_labels.push_back(std::make_pair(4, 5));
+	swap_label_list.push_back(swap_labels);
+	swap_labels.clear();
+    swap_labels.push_back(std::make_pair(0, 1));
+    swap_labels.push_back(std::make_pair(2, 3));
+	swap_label_list.push_back(swap_labels);
+	swap_labels.clear();
+    swap_labels.push_back(std::make_pair(0, 2));
+    swap_labels.push_back(std::make_pair(1, 3));
+	swap_label_list.push_back(swap_labels);
+	swap_labels.clear();
+    swap_labels.push_back(std::make_pair(0, 1));
+	swap_label_list.push_back(swap_labels);
+	swap_labels.clear();
+    swap_labels.push_back(std::make_pair(0, 1));
+	swap_label_list.push_back(swap_labels);
+	swap_labels.clear();
+	swap_label_list.push_back(swap_labels);
 
     // Shortcuts to global vars
     const int channels = this->datum_channels_;
@@ -213,6 +258,7 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 			
             // FengyangZhang: do random horizontal flip
             if (rand() % 2)
+            //if (true)
             {
                 // flip
                 cv::flip(img, img, 1);
@@ -220,6 +266,19 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 // "flip" annotation coordinates
                 for (int i = 0; i < label_num_valid_channels; i += 2)
                     cur_label_aug[i] = (float)width - cur_label_aug[i];
+			    // keep the original type's layout pattern
+				vector <pair <int, int> > swap_list = swap_label_list[cur_type];
+                int count = swap_list.size();
+                for (int i = 0; i < count; i++) {
+					int swap_left = swap_list[i].first;
+					int swap_right = swap_list[i].second;
+					float temp = cur_label_aug[swap_left * 2];
+					cur_label_aug[swap_left * 2] = cur_label_aug[swap_right * 2];
+					cur_label_aug[swap_right * 2] = temp;
+					temp = cur_label_aug[swap_left * 2 + 1];
+					cur_label_aug[swap_left * 2 + 1] = cur_label_aug[swap_right * 2 + 1];
+					cur_label_aug[swap_right * 2 + 1] = temp;
+				}
             }
 			else {
 				img = img;
@@ -264,7 +323,6 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 }
             }
 
-            const int type_ind_range[12] = {0, 8, 14, 20, 24, 28, 34, 38, 42, 44, 46, 48};
             int low_indice = type_ind_range[cur_type];
             int high_indice = type_ind_range[cur_type + 1];
             // store label as gaussian
