@@ -161,7 +161,6 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
                 	{
                     	int image_idx = idx_img * label_img_size + idx_ch * label_channel_size + i * label_width + j;
                         bottom_img.at<float>((int)i, (int)j) = (float)(bottom_pred[image_idx]);
-                        gt_img.at<float>((int)i, (int)j) = (float)(gt_pred[image_idx]);
                     }
                 }
             	std::stringstream ss;
@@ -169,10 +168,7 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
             	string str = ss.str();
 				cv::minMaxIdx(bottom_img, &min, &max);
 				cv::convertScaleAbs(bottom_img, bottom_img_8bit, 255 / max);
-				cv::minMaxIdx(gt_img, &min, &max);
-				cv::convertScaleAbs(gt_img, gt_img_8bit, 255 / max);
             	cv::imwrite("test/" + str + ".png", bottom_img_8bit);
-            	cv::imwrite("test/" + str + "gt.png", gt_img_8bit);
 			}
 		}
         if(is_test) {
@@ -184,7 +180,6 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
                 	{
                     	int image_idx = idx_img * label_img_size + idx_ch * label_channel_size + i * label_width + j;
                         bottom_img.at<float>((int)i, (int)j) = (float)(bottom_pred[image_idx]);
-                        gt_img.at<float>((int)i, (int)j) = (float)(gt_pred[image_idx]);
                     }
                 }
             	std::stringstream ss;
@@ -192,10 +187,7 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
             	string str = ss.str();
 				cv::minMaxIdx(bottom_img, &min, &max);
 				cv::convertScaleAbs(bottom_img, bottom_img_8bit, 255 / max);
-				cv::minMaxIdx(gt_img, &min, &max);
-				cv::convertScaleAbs(gt_img, gt_img_8bit, 255 / max);
             	cv::imwrite("test/" + str + ".png", bottom_img_8bit);
-            	cv::imwrite("test/" + str + "gt.png", gt_img_8bit);
 			}
 		}
     }
