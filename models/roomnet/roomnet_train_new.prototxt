@@ -1192,5 +1192,5 @@ layer {
   softmax_param {
     engine: CAFFE
   }
-  loss_weight:0
+  loss_weight:1
 }

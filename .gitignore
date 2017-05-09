@@ -100,3 +100,4 @@ MANIFEST-*
 # added by fengyangz
 core.*
 train/*
+test/*
