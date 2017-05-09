@@ -85,19 +85,11 @@ template <typename Dtype>
 void HeatmapVisualizeLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom)
 {
-    const Dtype alpha = top[0]->cpu_diff()[0];
-    caffe_cpu_axpby(
-        bottom[0]->count(),
-        alpha,
-        diff_.cpu_data(),
-        Dtype(0),
-        bottom[0]->mutable_cpu_diff()
-    );
 }
 
 
 template <typename Dtype>
-void HeatmapVisualizeayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+void HeatmapVisualizeLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
         const vector<Blob<Dtype>*>& top)
 {
     Forward_cpu(bottom, top);

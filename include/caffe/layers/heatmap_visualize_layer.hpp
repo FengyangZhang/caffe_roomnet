@@ -20,7 +20,7 @@ template <typename Dtype>
 class HeatmapVisualizeLayer : public LossLayer<Dtype> {
 public:
   explicit HeatmapVisualizeLayer(const LayerParameter& param)
-    : LossLayer<Dtype>(param), diff_() {}
+    : LossLayer<Dtype>(param) {}
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
                        const vector<Blob<Dtype>*>& top);
 

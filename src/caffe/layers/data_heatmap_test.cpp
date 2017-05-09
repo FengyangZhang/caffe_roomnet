@@ -41,12 +41,12 @@ void DataHeatmapTestLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bot
     HeatmapTestParameter heatmap_test_param = this->layer_param_.heatmap_test_param();
 
     // Shortcuts
-    const int batchsize = heatmap_data_param.batchsize();
-    const int outsize = heatmap_data_param.outsize();
-    root_img_dir_ = heatmap_data_param.root_img_dir();
+    const int batchsize = heatmap_test_param.batchsize();
+    const int outsize = heatmap_test_param.outsize();
+    root_img_dir_ = heatmap_test_param.root_img_dir();
 
     // load GT
-    std::string gt_path = heatmap_data_param.source();
+    std::string gt_path = heatmap_test_param.source();
     LOG(INFO) << "Loading annotation from " << gt_path;
 
     std::ifstream infile(gt_path.c_str());
@@ -69,7 +69,6 @@ void DataHeatmapTestLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bot
     top[0]->Reshape(batchsize, this->datum_channels_, outsize, outsize);
     for (int i = 0; i < this->PREFETCH_COUNT; ++i)
         this->prefetch_[i].data_.Reshape(batchsize, this->datum_channels_, outsize, outsize);
-    this->datum_size_ = this->datum_channels_ * outsize * outsize;
 
     LOG(INFO) << "output data size: " << top[0]->num() << "," << top[0]->channels() << "," << top[0]->height() << "," << top[0]->width();
 
@@ -169,7 +168,7 @@ void DataHeatmapTestLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             {
                 for (int j = 0; j < outsize; j++)
                 {
-                    top_data[idx_img_aug * img_size + c * channel_size + i * outsize + j] = img_res.at<cv::Vec3f>(i, j)[c];
+                    top_data[idx_img * img_size + c * channel_size + i * outsize + j] = img_res.at<cv::Vec3f>(i, j)[c];
                 }
             }
         }

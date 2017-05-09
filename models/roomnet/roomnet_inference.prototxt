@@ -3,8 +3,8 @@ layer {
   name: "data"
   type: "DataHeatmapTest"
   top: "data"
-  heatmap_data_param {
-    source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/train_single.txt"
+  heatmap_test_param {
+    source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/testing.txt"
     root_img_dir: "/data01/vision_rd/zhangfengyang/roomnet/LSUN/images/"
     batchsize: 1
     outsize: 320
