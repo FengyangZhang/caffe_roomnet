@@ -22,7 +22,7 @@ namespace caffe {
 template <typename Dtype>
 void HeatmapVisualizeLayer<Dtype>::Reshape(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
-    LossLayer<Dtype>::Reshape(bottom, top);
+    //LossLayer<Dtype>::Reshape(bottom, top);
 }
 
 
