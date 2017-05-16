@@ -114,7 +114,14 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
                     int image_idx = idx_img * label_img_size + idx_ch * label_channel_size + i * label_width + j;
                     // euclidean loss per pixel
                     float diff = (float)bottom_pred[image_idx] - (float)gt_pred[image_idx];
-					
+					if(is_test) {
+						if(diff >= 0) {
+				    		pixel_error += diff / 0.315;
+						}
+						else {
+							pixel_error -= diff / 0.315;	
+						}
+					}
 					// degrade the background gradients
 					if(gt_pred[image_idx] <= 0.01) {
 						diff *= 0.2;
@@ -149,7 +156,8 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
             	cv::imwrite("test/" + str + ".png", bottom_img_8bit);
             	cv::imwrite("test/" + str + "gt.png", gt_img_8bit);
             	cv::imwrite("test/" + str + "diff.png", diff_img_8bit);
-			}
+			}	
+			DLOG(INFO) << "accumulated error: " << pixel_error;
         }
         // if test, save other channel's heatmaps as well
         if(is_test) {

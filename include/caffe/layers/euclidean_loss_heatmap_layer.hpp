@@ -65,6 +65,7 @@ protected:
 
   // validation mode flag
   bool val_mode_;
+  float pixel_error;
 };
 
 
