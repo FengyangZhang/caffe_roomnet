@@ -23,6 +23,8 @@ template <typename Dtype>
 void HeatmapVisualizeLayer<Dtype>::Reshape(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
     //LossLayer<Dtype>::Reshape(bottom, top);
+    vector<int> loss_shape(0);  // Loss layers output a scalar; 0 axes.
+  	top[0]->Reshape(loss_shape);
 }
 
 
@@ -78,6 +80,7 @@ void HeatmapVisualizeLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         }
         img_id++;
     }
+	top[0]->mutable_cpu_data()[0] = 0;
 }
 
 
