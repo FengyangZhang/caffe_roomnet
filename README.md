@@ -1,6 +1,11 @@
 # Caffe_Roomnet
 
-A CNN-based neural network for layout estimation from a monocular vision image. Still under development...
+A CNN-based neural network for layout estimation from a monocular vision image.
+Although there's still things to be done about it, you can train the model by the following command now:
+    
+    ./build/tools/caffe train -solver models/roomnet/roomnet_solver.prototxt
+    
+You may have to play with the parameters a little bit, but in my case the current one is doing well.
 
 ## Roomnet paper
 
