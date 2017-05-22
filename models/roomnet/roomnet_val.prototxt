@@ -7,7 +7,7 @@ layer {
   top: "type"
   is_test: true
   heatmap_data_param {
-    source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/train_single.txt"
+    source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/validation.txt"
     root_img_dir: "/data01/vision_rd/zhangfengyang/roomnet/LSUN/images/"
     batchsize: 1
     outsize: 320
