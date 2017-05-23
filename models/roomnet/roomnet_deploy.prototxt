@@ -1,15 +1,8 @@
-name: "RoomNet"
-layer {
-  name: "data"
-  type: "DataHeatmapTest"
-  top: "data"
-  heatmap_test_param {
-    source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/train_single.txt"
-    root_img_dir: "/data01/vision_rd/zhangfengyang/roomnet/LSUN/images/"
-    batchsize: 1
-    outsize: 320
-  }
-}
+input: "data"
+input_dim: 1
+input_dim: 3
+input_dim: 320
+input_dim: 320
 layer {
   bottom: "data"
   top: "conv1_1"

@@ -63,11 +63,7 @@ protected:
     int datum_width_;
     int datum_size_;
     int num_means_;
-    int cur_class_;
     vector<int> labelinds_;
-    vector<cv::Mat> mean_img_;
-    bool sub_mean_;  // true if the mean should be subtracted
-    bool sample_per_cluster_; // sample separately per cluster?
     string root_img_dir_;
     vector<float> cur_class_img_; // current class index
     int cur_img_; // current image index

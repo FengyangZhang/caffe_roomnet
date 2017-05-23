@@ -172,7 +172,6 @@ void DataHeatmapTestLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 }
             }
         }
-
         DLOG(INFO) << "next image";
 
         // move to the next image
