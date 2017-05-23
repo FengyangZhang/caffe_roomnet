@@ -201,7 +201,6 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         std::string img_path = this->root_img_dir_ + img_name;
         DLOG(INFO) << "img: " << img_path;
         img = cv::imread(img_path, CV_LOAD_IMAGE_COLOR);
-
         int width = img.cols;
         int height = img.rows;
         int x_border = width - outsize;
@@ -284,13 +283,13 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 				img = img;
 			}
 
-            DLOG(INFO) << "Resizing output image.";
+            //DLOG(INFO) << "Resizing output image.";
 
             // resize to output image size
             float resizeFact_x = (float)outsize / (float)img.cols;
             float resizeFact_y = (float)outsize / (float)img.rows;
-			DLOG(INFO) << "resizeFact_x: " << resizeFact_x;	
-			DLOG(INFO) << "resizeFact_y: " << resizeFact_y;	
+			//DLOG(INFO) << "resizeFact_x: " << resizeFact_x;	
+			//DLOG(INFO) << "resizeFact_y: " << resizeFact_y;	
 
             cv::Size s(outsize, outsize);
             cv::resize(img, img_res, s);
@@ -311,7 +310,7 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             const int img_size = channel_size * channels;
 
             // store image data
-            DLOG(INFO) << "storing image";
+            //DLOG(INFO) << "storing image";
             for (int c = 0; c < channels; c++)
             {
                 for (int i = 0; i < outsize; i++)
@@ -326,7 +325,7 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             int low_indice = type_ind_range[cur_type];
             int high_indice = type_ind_range[cur_type + 1];
             // store label as gaussian
-            DLOG(INFO) << "storing labels";
+            //DLOG(INFO) << "storing labels";
             const int label_channel_size = label_height * label_width;
             const int label_img_size = label_channel_size * label_num_channels;
             float label_resize_fact = (float) label_height / (float) outsize;
@@ -377,7 +376,7 @@ void DataHeatmapLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
         } // jittered versions loop
 
-        DLOG(INFO) << "next image";
+        //DLOG(INFO) << "next image";
 
         // move to the next image
         this->AdvanceCurImg();

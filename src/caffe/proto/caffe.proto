@@ -414,7 +414,6 @@ message LayerParameter {
   optional HeatmapDataParameter heatmap_data_param = 147;
   optional BNParameter bn_param = 45;
   optional UpsampleParameter upsample_param = 148;
-  optional HeatmapTestParameter heatmap_test_param = 149;
 }
 
 // Message that stores parameters used to apply transformation
@@ -786,14 +785,6 @@ message HeatmapDataParameter {
   optional bool dont_flip_first = 1016 [ default = true ];
   optional float angle_max = 1017 [ default = 0 ];  
   optional bool flip_joint_labels = 1018 [ default = true ];
-}
-
-message HeatmapTestParameter {
-  optional uint32 num_channels = 1002 [default = 3]; 
-  optional uint32 batchsize = 1003;
-  optional string root_img_dir = 1004;
-  optional string source = 1008;
-  optional uint32 outsize = 1012 [default = 0];
 }
 
 message UpsampleParameter {

@@ -46,8 +46,6 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
 {
     Dtype loss = 0;
 
-    int visualise_channel = this->layer_param_.visualise_channel();
-    bool visualise = this->layer_param_.visualise();
 	bool is_test = this->layer_param_.is_test();
     const Dtype* bottom_pred = bottom[0]->cpu_data(); // predictions for all images
     const Dtype* gt_pred = bottom[1]->cpu_data();    // GT predictions
@@ -59,10 +57,8 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
     const int label_height = bottom[1]->height();
     const int label_width = bottom[1]->width();
     const int num_channels = bottom[0]->channels();
-    // hardcode to be removed
-    const int num_types = 11; 
 
-    DLOG(INFO) << "bottom size: " << bottom[0]->height() << " " << bottom[0]->width() << " " << bottom[0]->channels();
+    //DLOG(INFO) << "bottom size: " << bottom[0]->height() << " " << bottom[0]->width() << " " << bottom[0]->channels();
 
     const int label_channel_size = label_height * label_width;
     const int label_img_size = label_channel_size * num_channels;
@@ -99,11 +95,6 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
     // Loop over images
     for (int idx_img = 0; idx_img < num_images; idx_img++)
     {
-        // find predicted type indice
-        // int offset = num_types * idx_img;
-        // int type_pred = std::distance(type_prob_pred+offset, std::max_element(type_prob_pred+offset, type_prob_pred+offset+num_types));
-		// DLOG(INFO) << "+++++++++++++type_pred:" << type_pred;
-        // Compute loss (only those channels of the predicted layout type)
         DLOG(INFO) << "The ground truth type is:" << type_gt[idx_img];
 		int type_int = (int)type_gt[idx_img];
         for (int idx_ch = type_ind_range[type_int]; idx_ch <= type_ind_range[type_int+1] - 1; idx_ch++)
@@ -115,6 +106,7 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
                     int image_idx = idx_img * label_img_size + idx_ch * label_channel_size + i * label_width + j;
                     // euclidean loss per pixel
                     float diff = (float)bottom_pred[image_idx] - (float)gt_pred[image_idx];
+ 					// this code is for validation and test, 0.315 is because the gt heatmap max value is 0.315
 					if(is_test) {
 						if(diff >= 0) {
 				    		pixel_error_img += diff / 0.315;
