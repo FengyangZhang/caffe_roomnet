@@ -9,7 +9,7 @@ layer {
   heatmap_data_param {
     source: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/train/training.txt"
     root_img_dir: "/data01/vision_rd/zhangfengyang/roomnet/LSUN/images/"
-    batchsize: 16
+    batchsize: 10
     outsize: 320
     label_width: 40
     label_height: 40
@@ -225,8 +225,8 @@ layer {
 # first stage
 layer {
   bottom: "pool2"
-  top: "conv3_1_s1"
-  name: "conv3_1_s1"
+  top: "conv3_1"
+  name: "conv3_1"
   type: "Convolution"
   param {
     lr_mult: 1
@@ -249,9 +249,9 @@ layer {
   }
 }
 layer {
-  bottom: "conv3_1_s1"
-  top: "conv3_1_s1"
-  name: "conv3_1_bn_s1"
+  bottom: "conv3_1"
+  top: "conv3_1"
+  name: "conv3_1_bn"
   type: "BatchNorm"
   param {
     lr_mult: 0
@@ -264,15 +264,15 @@ layer {
   }
 }
 layer {
-  bottom: "conv3_1_s1"
-  top: "conv3_1_s1"
-  name: "relu3_1_s1"
+  bottom: "conv3_1"
+  top: "conv3_1"
+  name: "relu3_1"
   type: "ReLU"
 }
 layer {
-  bottom: "conv3_1_s1"
-  top: "conv3_2_s1"
-  name: "conv3_2_s1"
+  bottom: "conv3_1"
+  top: "conv3_2"
+  name: "conv3_2"
   type: "Convolution"
   param {
     lr_mult: 1
@@ -295,9 +295,9 @@ layer {
   }
 }
 layer {
-  bottom: "conv3_2_s1"
-  top: "conv3_2_s1"
-  name: "conv3_2_bn_s1"
+  bottom: "conv3_2"
+  top: "conv3_2"
+  name: "conv3_2_bn"
   type: "BatchNorm"
   param {
     lr_mult: 0
@@ -310,15 +310,15 @@ layer {
   }
 }
 layer {
-  bottom: "conv3_2_s1"
-  top: "conv3_2_s1"
-  name: "relu3_2_s1"
+  bottom: "conv3_2"
+  top: "conv3_2"
+  name: "relu3_2"
   type: "ReLU"
 }
 layer {
-  bottom: "conv3_2_s1"
-  top: "conv3_3_s1"
-  name: "conv3_3_s1"
+  bottom: "conv3_2"
+  top: "conv3_3"
+  name: "conv3_3"
   type: "Convolution"
   param {
     lr_mult: 1
@@ -341,9 +341,9 @@ layer {
   }
 }
 layer {
-  bottom: "conv3_3_s1"
-  top: "conv3_3_s1"
-  name: "conv3_3_bn_s1"
+  bottom: "conv3_3"
+  top: "conv3_3"
+  name: "conv3_3_bn"
   type: "BatchNorm"
   param {
     lr_mult: 0
@@ -356,15 +356,15 @@ layer {
   }
 }
 layer {
-  bottom: "conv3_3_s1"
-  top: "conv3_3_s1"
-  name: "relu3_3_s1"
+  bottom: "conv3_3"
+  top: "conv3_3"
+  name: "relu3_3"
   type: "ReLU"
 }
 layer {
-  bottom: "conv3_3_s1"
-  top: "pool3_s1"
-  name: "pool3_s1"
+  bottom: "conv3_3"
+  top: "pool3"
+  name: "pool3"
   type: "Pooling"
   pooling_param {
     pool: MAX
@@ -373,16 +373,16 @@ layer {
   }
 }
 layer {
-  bottom: "pool3_s1"
-    top: "pool3_s1"
-    name: "pool3_drop_s1"
+  bottom: "pool3"
+    top: "pool3"
+    name: "pool3_drop"
     type: "Dropout"
     dropout_param {
       dropout_ratio: 0.5
     }
 }
 layer {
-  bottom: "pool3_s1"
+  bottom: "pool3"
   top: "conv4_1_s1"
   name: "conv4_1_s1"
   type: "Convolution"
@@ -1017,6 +1017,144 @@ layer {
 # second stage
 layer {
   bottom: "conv4_1_D_s1"
+  top: "conv4_1_s2"
+  name: "conv4_1_s2"
+  type: "Convolution"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "constant"
+    }
+    num_output: 512
+    pad: 1
+    kernel_size: 3
+  }
+}
+layer {
+  bottom: "conv4_1_s2"
+  top: "conv4_1_s2"
+  name: "conv4_1_bn_s2"
+  type: "BatchNorm"
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+}
+layer {
+  bottom: "conv4_1_s2"
+  top: "conv4_1_s2"
+  name: "relu4_1_s2"
+  type: "ReLU"
+}
+layer {
+  bottom: "conv4_1_s2"
+  top: "conv4_2_s2"
+  name: "conv4_2_s2"
+  type: "Convolution"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "constant"
+    }
+    num_output: 512
+    pad: 1
+    kernel_size: 3
+  }
+}
+layer {
+  bottom: "conv4_2_s2"
+  top: "conv4_2_s2"
+  name: "conv4_2_bn_s2"
+  type: "BatchNorm"
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+}
+layer {
+  bottom: "conv4_2_s2"
+  top: "conv4_2_s2"
+  name: "relu4_2_s2"
+  type: "ReLU"
+}
+layer {
+  bottom: "conv4_2_s2"
+  top: "conv4_3_s2"
+  name: "conv4_3_s2"
+  type: "Convolution"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "constant"
+    }
+    num_output: 512
+    pad: 1
+    kernel_size: 3
+  }
+}
+layer {
+  bottom: "conv4_3_s2"
+  top: "conv4_3_s2"
+  name: "conv4_3_bn_s2"
+  type: "BatchNorm"
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+}
+layer {
+  bottom: "conv4_3_s2"
+  top: "conv4_3_s2"
+  name: "relu4_3_s2"
+  type: "ReLU"
+}
+layer {
+  bottom: "conv4_3_s2"
   top: "pool4_s2"
   top: "pool4_mask_s2"
   name: "pool4_s2"
@@ -1504,7 +1642,6 @@ layer {
   top: "conv4_1_D_s2"
   name: "relu4_1_D_s2"
   type: "ReLU"
-
 }
 
 
@@ -1514,6 +1651,144 @@ layer {
 # third stage
 layer {
   bottom: "conv4_1_D_s2"
+  top: "conv4_1_s3"
+  name: "conv4_1_s3"
+  type: "Convolution"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "constant"
+    }
+    num_output: 512
+    pad: 1
+    kernel_size: 3
+  }
+}
+layer {
+  bottom: "conv4_1_s3"
+  top: "conv4_1_s3"
+  name: "conv4_1_bn_s3"
+  type: "BatchNorm"
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+}
+layer {
+  bottom: "conv4_1_s3"
+  top: "conv4_1_s3"
+  name: "relu4_1_s3"
+  type: "ReLU"
+}
+layer {
+  bottom: "conv4_1_s3"
+  top: "conv4_2_s3"
+  name: "conv4_2_s3"
+  type: "Convolution"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "constant"
+    }
+    num_output: 512
+    pad: 1
+    kernel_size: 3
+  }
+}
+layer {
+  bottom: "conv4_2_s3"
+  top: "conv4_2_s3"
+  name: "conv4_2_bn_s3"
+  type: "BatchNorm"
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+}
+layer {
+  bottom: "conv4_2_s3"
+  top: "conv4_2_s3"
+  name: "relu4_2_s3"
+  type: "ReLU"
+}
+layer {
+  bottom: "conv4_2_s3"
+  top: "conv4_3_s3"
+  name: "conv4_3_s3"
+  type: "Convolution"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "constant"
+    }
+    num_output: 512
+    pad: 1
+    kernel_size: 3
+  }
+}
+layer {
+  bottom: "conv4_3_s3"
+  top: "conv4_3_s3"
+  name: "conv4_3_bn_s3"
+  type: "BatchNorm"
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+}
+layer {
+  bottom: "conv4_3_s3"
+  top: "conv4_3_s3"
+  name: "relu4_3_s3"
+  type: "ReLU"
+}
+layer {
+  bottom: "conv4_3_s3"
   top: "pool4_s3"
   top: "pool4_mask_s3"
   name: "pool4_s3"
@@ -2001,7 +2276,6 @@ layer {
   top: "conv4_1_D_s3"
   name: "relu4_1_D_s3"
   type: "ReLU"
-
 }
 
 

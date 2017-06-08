@@ -151,9 +151,11 @@ void EuclideanLossHeatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
             	cv::imwrite("test/" + str + "diff.png", diff_img_8bit);
 			}	
         }
-		pixel_error_img /= (type_ind_range[type_int+1] - type_ind_range[type_int]) * 1600;
-		pixel_error += pixel_error_img;
-		DLOG(INFO) << "accumulated pixel error: " << pixel_error;
+		if(is_test) {
+			pixel_error_img /= (type_ind_range[type_int+1] - type_ind_range[type_int]) * 1600;
+			pixel_error += pixel_error_img;
+			DLOG(INFO) << "accumulated pixel error: " << pixel_error;
+        }
         // if test, save other channel's heatmaps as well
         if(is_test) {
         	for (int idx_ch = 0; idx_ch < type_ind_range[type_int]; idx_ch++)

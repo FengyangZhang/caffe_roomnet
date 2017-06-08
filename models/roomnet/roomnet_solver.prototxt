@@ -1,4 +1,4 @@
-net: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/models/roomnet/roomnet_train.prototxt"
+net: "/data01/vision_rd/zhangfengyang/roomnet/caffe_roomnet/models/roomnet/roomnet_recurrent.prototxt"
 test_initialization: false
 test_iter: 1
 test_interval: 10000000
