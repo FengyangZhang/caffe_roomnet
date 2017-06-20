@@ -1016,7 +1016,18 @@ layer {
 
 # second stage
 layer {
+  name: "concat_stage2"
+  type: "Concat"
   bottom: "conv4_1_D_s1"
+  bottom: "pool3"
+  top: "concat_stage2"
+  concat_param {
+    axis: 1
+  }
+}
+
+layer {
+  bottom: "concat_stage2"
   top: "conv4_1_s2"
   name: "conv4_1_s2"
   type: "Convolution"
@@ -1650,7 +1661,17 @@ layer {
 
 # third stage
 layer {
+  name: "concat_stage3"
+  type: "Concat"
   bottom: "conv4_1_D_s2"
+  bottom: "pool3"
+  top: "concat_stage3"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
+  bottom: "concat_stage3"
   top: "conv4_1_s3"
   name: "conv4_1_s3"
   type: "Convolution"
